@@ -85,8 +85,8 @@ TRACK.modules.push({
      "rows": [
       [
        "Tier 0 (self-service)",
-       "Knowledge base, portals, password reset tools",
-       "User resets own password through a portal",
+       "Knowledge base, portal, self-service password reset, virtual agent (chatbot)",
+       "User resets own password with MFA through a portal",
        "Tier 1 if it fails"
       ],
       [
@@ -109,6 +109,119 @@ TRACK.modules.push({
       ]
      ],
      "title": "Typical support tiers"
+    },
+    {
+     "type": "topology",
+     "title": "Help-desk tooling in a typical organisation",
+     "nodes": [
+      {
+       "id": "kb",
+       "kind": "doc",
+       "label": "Knowledge base",
+       "sub": "articles for users and staff",
+       "x": 1,
+       "y": 0
+      },
+      {
+       "id": "cmdb",
+       "kind": "db",
+       "label": "Asset register",
+       "sub": "devices, owners, warranty",
+       "x": 3,
+       "y": 0
+      },
+      {
+       "id": "mon",
+       "kind": "monitor",
+       "label": "Monitoring",
+       "sub": "alerts from devices",
+       "x": 5,
+       "y": 0
+      },
+      {
+       "id": "portal",
+       "kind": "process",
+       "label": "Self-service",
+       "sub": "portal, chat, virtual agent",
+       "x": 1,
+       "y": 2
+      },
+      {
+       "id": "itsm",
+       "kind": "process",
+       "label": "Ticketing system",
+       "sub": "one queue, SLAs, history",
+       "x": 3,
+       "y": 2
+      },
+      {
+       "id": "rs",
+       "kind": "process",
+       "label": "Remote support",
+       "sub": "consent and logging",
+       "x": 5,
+       "y": 2
+      },
+      {
+       "id": "users",
+       "kind": "team",
+       "label": "Users",
+       "sub": "phone, email, walk-up",
+       "x": 1,
+       "y": 4
+      },
+      {
+       "id": "tech",
+       "kind": "user",
+       "label": "Technicians",
+       "sub": "Tier 1 to Tier 3",
+       "x": 4,
+       "y": 4
+      }
+     ],
+     "links": [
+      {
+       "a": "users",
+       "b": "portal",
+       "label": "self-help"
+      },
+      {
+       "a": "users",
+       "b": "itsm",
+       "label": "call / email"
+      },
+      {
+       "a": "portal",
+       "b": "itsm",
+       "label": "creates ticket"
+      },
+      {
+       "a": "kb",
+       "b": "portal",
+       "label": "articles"
+      },
+      {
+       "a": "cmdb",
+       "b": "itsm",
+       "label": "linked assets"
+      },
+      {
+       "a": "mon",
+       "b": "itsm",
+       "label": "auto-tickets",
+       "style": "dashed"
+      },
+      {
+       "a": "tech",
+       "b": "itsm",
+       "label": "work queue"
+      },
+      {
+       "a": "tech",
+       "b": "rs"
+      }
+     ],
+     "caption": "Every channel ends in one ticketing system, which links to knowledge, asset records and monitoring. Notice that self-service and monitoring alerts can create tickets without anyone picking up a phone."
     },
     {
      "type": "callout",
@@ -296,6 +409,17 @@ TRACK.modules.push({
        "term": "Gibibyte (GiB)",
        "def": "2^30 bytes (1,073,741,824 bytes); operating systems often show this value while labelling it GB."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Support exists to keep people productive; technical skill and communication count equally.",
+      "Work flows from self-service up through tiers, and escalation passes evidence, not just the problem.",
+      "One ticketing system ties channels, knowledge, assets and monitoring together.",
+      "Drive makers count in decimal (GB), operating systems in binary (GiB): 1 TB shows as about 931 GiB.",
+      "Network speeds are in bits, file sizes in bytes: multiply bytes by 8 before dividing by link speed."
      ]
     },
     {
@@ -521,6 +645,11 @@ TRACK.modules.push({
        "Cannot be upgraded; buy enough at purchase"
       ],
       [
+       "LPCAMM2 / CAMM2",
+       "Some newer thin laptops and workstations",
+       "Compact, replaceable module for low-power memory; check the service manual"
+      ],
+      [
        "ECC memory",
        "Servers, workstations",
        "Detects and corrects single-bit errors; needs board support"
@@ -543,6 +672,33 @@ TRACK.modules.push({
       }
      ],
      "title": "Memory maths"
+    },
+    {
+     "type": "chart",
+     "kind": "bar",
+     "title": "Peak bandwidth of one memory channel",
+     "labels": [
+      "DDR4-2400",
+      "DDR4-3200",
+      "DDR5-4800",
+      "DDR5-5600",
+      "DDR5-6400"
+     ],
+     "series": [
+      {
+       "name": "Peak per channel",
+       "values": [
+        19.2,
+        25.6,
+        38.4,
+        44.8,
+        51.2
+       ]
+      }
+     ],
+     "unit": " GB/s",
+     "yLabel": "GB/s per 64-bit channel",
+     "caption": "Each bar is MT/s x 8 bytes, so the numbers are exact theoretical peaks; real throughput is lower. Notice that filling a second channel doubles these figures, which is why matched pairs matter."
     },
     {
      "type": "steps",
@@ -652,6 +808,17 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Socket, chipset support and firmware version decide whether a CPU fits a board.",
+      "DDR4 and DDR5 are keyed differently and never interchangeable; check the manual before buying.",
+      "Matched modules in the recommended slots enable dual channel and double peak bandwidth.",
+      "Soldered LPDDR cannot be upgraded, so size laptop memory correctly at purchase.",
+      "Read-only inventory commands give exact CPU and memory details for records and upgrades."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -756,7 +923,7 @@ TRACK.modules.push({
       [
        "NVMe SSD (M.2)",
        "PCIe",
-       "3,000-12,000 MB/s",
+       "About 3,000-14,000 MB/s (PCIe 3.0 to 5.0)",
        "Fastest boot and app load",
        "Heat throttling; check M.2 key and PCIe support"
       ],
@@ -769,6 +936,33 @@ TRACK.modules.push({
       ]
      ],
      "title": "Storage technologies compared"
+    },
+    {
+     "type": "chart",
+     "kind": "bar",
+     "title": "Typical sequential read speed by drive type",
+     "labels": [
+      "HDD",
+      "SATA SSD",
+      "NVMe PCIe 3.0",
+      "NVMe PCIe 4.0",
+      "NVMe PCIe 5.0"
+     ],
+     "series": [
+      {
+       "name": "Typical read",
+       "values": [
+        200,
+        550,
+        3500,
+        7000,
+        12000
+       ]
+      }
+     ],
+     "unit": " MB/s",
+     "yLabel": "MB/s",
+     "caption": "Illustrative figures for good drives of each type; real results depend on the model, slot and workload. For users the biggest felt jump is from any HDD to any SSD, because access time drops from milliseconds to microseconds."
     },
     {
      "type": "callout",
@@ -976,6 +1170,17 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Physical faults in storage, power or cooling often look like software problems; check them first.",
+      "M.2 is a shape: confirm SATA or NVMe support and the module length before ordering.",
+      "Size a PSU at about 1.3-1.5 times the estimated peak load, and use a UPS where mains power is unstable.",
+      "Overheating follows a pattern: measure, clean, refresh paste, then retest under load.",
+      "Make sure a current backup exists before repairing any volume."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -1064,7 +1269,7 @@ TRACK.modules.push({
       [
        "USB-C",
        "Data, video, power (depends on port)",
-       "Same shape, different abilities; check the icons and specs"
+       "Same shape, different abilities: look for USB4, Thunderbolt or DisplayPort marks and the charging wattage"
       ],
       [
        "USB-A",
@@ -1097,8 +1302,104 @@ TRACK.modules.push({
     {
      "type": "callout",
      "kind": "warning",
-     "text": "A USB-C port might support only USB 2.0 data, or full USB4 with video and 100 W charging. When a docking station or monitor 'does not work', check what that specific port supports before replacing hardware.",
+     "text": "A USB-C port might offer only USB 2.0 data and slow charging, or USB4 or Thunderbolt with 40-80 Gbps, several screens and up to 240 W of charging with a suitable cable. When a docking station or monitor 'does not work', check what that specific port and cable support before replacing hardware.",
      "title": "Not every USB-C port is equal"
+    },
+    {
+     "type": "topology",
+     "title": "A typical USB-C desk setup",
+     "nodes": [
+      {
+       "id": "mon1",
+       "kind": "monitor",
+       "label": "Monitor 1",
+       "sub": "DisplayPort",
+       "x": 1,
+       "y": 0
+      },
+      {
+       "id": "mon2",
+       "kind": "monitor",
+       "label": "Monitor 2",
+       "sub": "HDMI",
+       "x": 3,
+       "y": 0
+      },
+      {
+       "id": "sw",
+       "kind": "switch",
+       "label": "Office switch",
+       "sub": "wired LAN",
+       "x": 5,
+       "y": 0
+      },
+      {
+       "id": "usb",
+       "kind": "host",
+       "label": "USB devices",
+       "sub": "keyboard, mouse, headset",
+       "x": 1,
+       "y": 2
+      },
+      {
+       "id": "dock",
+       "kind": "process",
+       "label": "Docking station",
+       "sub": "USB4 / Thunderbolt",
+       "x": 3,
+       "y": 2
+      },
+      {
+       "id": "pwr",
+       "kind": "process",
+       "label": "Dock power",
+       "sub": "charges the laptop",
+       "x": 5,
+       "y": 2
+      },
+      {
+       "id": "lap",
+       "kind": "laptop",
+       "label": "Laptop",
+       "sub": "USB-C with video + PD",
+       "x": 3,
+       "y": 4
+      }
+     ],
+     "links": [
+      {
+       "a": "lap",
+       "b": "dock",
+       "label": "one USB-C cable",
+       "style": "bold"
+      },
+      {
+       "a": "dock",
+       "b": "mon1",
+       "label": "DP"
+      },
+      {
+       "a": "dock",
+       "b": "mon2",
+       "label": "HDMI"
+      },
+      {
+       "a": "dock",
+       "b": "sw",
+       "label": "Ethernet"
+      },
+      {
+       "a": "dock",
+       "b": "usb",
+       "label": "USB-A"
+      },
+      {
+       "a": "dock",
+       "b": "pwr",
+       "label": "DC in"
+      }
+     ],
+     "caption": "One cable carries video, data, network and charging. If one screen or charging fails, check what the laptop port and cable support (video mode, bandwidth, wattage) before blaming the dock."
     },
     {
      "type": "steps",
@@ -1274,6 +1575,17 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "USB-C is a connector, not a capability: data speed, video and charging depend on the port and cable.",
+      "Work through display faults in order: power and input, cable and port, OS settings, driver, hardware.",
+      "Remove a single stuck print job before restarting the spooler or reinstalling printers.",
+      "Swollen batteries are a safety hazard: stop use and replace.",
+      "Report lost or stolen devices at once so they can be locked or wiped."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -1330,6 +1642,17 @@ TRACK.modules.push({
        ],
        "answer": 2,
        "explain": "Speed protects data: locking or wiping and securing accounts limits exposure. Waiting increases risk, and the Wi-Fi password is not the main issue."
+      },
+      {
+       "q": "A laptop that needs 100 W shows a 'slow charger' warning only when connected through a new dock. Monitors and network work. What is the most likely cause?",
+       "options": [
+        "The second monitor is running at a refresh rate that is far too high",
+        "The dock's Ethernet port is connected to a slow switch",
+        "The cable or dock delivers less power than the laptop needs",
+        "The battery must be fully drained once before docking works"
+       ],
+       "answer": 2,
+       "explain": "Charging power depends on the dock's rating, how much it keeps for itself and the cable's rating. Monitor refresh, network speed and battery draining do not limit the charging wattage."
       }
      ]
     }
@@ -1462,6 +1785,46 @@ TRACK.modules.push({
      "title": "Reading POST failures"
     },
     {
+     "type": "tree",
+     "title": "When a PC will not start: a symptom-first decision tree",
+     "root": {
+      "label": "PC will not start",
+      "children": [
+       {
+        "label": "No lights, no fans",
+        "text": "Outlet, PSU switch, known-good cable, then PSU"
+       },
+       {
+        "label": "Fans spin, no display",
+        "text": "Read the debug LEDs or beeps",
+        "children": [
+         {
+          "label": "Memory LED",
+          "text": "Reseat; one module in primary slot"
+         },
+         {
+          "label": "CPU LED",
+          "text": "8-pin CPU power, cooler, socket"
+         },
+         {
+          "label": "VGA LED",
+          "text": "GPU seating, power, right port"
+         }
+        ]
+       },
+       {
+        "label": "Logo, then no OS",
+        "text": "Drive detected? UEFI boot order"
+       },
+       {
+        "label": "Starts, then restarts",
+        "text": "Temperatures, PSU load, event logs"
+       }
+      ]
+     },
+     "caption": "Start from what the user actually sees, then let the board's LEDs or beep codes narrow it down. Each leaf is one safe test to run before any part is replaced."
+    },
+    {
      "type": "callout",
      "kind": "pro",
      "text": "When a system will not POST, strip it to the minimum: board, CPU with cooler, one RAM module and PSU, with on-board video. If it starts, add parts back one at a time. The part that brings the fault back is the culprit.",
@@ -1483,7 +1846,7 @@ TRACK.modules.push({
        "title": "Replace when",
        "items": [
         "Repair costs exceed about 50% of a new device",
-        "The device is out of security support or near end of life",
+        "The device cannot run a supported OS (for example no TPM 2.0 for Windows 11) or is near end of life",
         "Parts are soldered or proprietary and hard to get",
         "Failures keep repeating on the same model"
        ]
@@ -1590,6 +1953,17 @@ TRACK.modules.push({
        "term": "Minimum configuration",
        "def": "Testing with only the essential parts installed to isolate a hardware fault."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Safety first: power off, unplug, discharge, use ESD protection and never open a PSU.",
+      "Assemble in a fixed order and test POST before closing the case.",
+      "No POST? Strip to minimum configuration and add parts back one at a time.",
+      "Repair cheap standard parts; replace when costs pass about half a new device or OS support ends.",
+      "Record every build and repair against the asset tag."
      ]
     },
     {
@@ -1825,6 +2199,36 @@ TRACK.modules.push({
      "title": "File systems you will meet"
     },
     {
+     "type": "tree",
+     "title": "Choosing a file system",
+     "root": {
+      "label": "Where will the volume be used?",
+      "children": [
+       {
+        "label": "Windows system drive",
+        "text": "NTFS"
+       },
+       {
+        "label": "USB for Windows and Mac",
+        "text": "exFAT (FAT32 only if every file is under 4 GB)"
+       },
+       {
+        "label": "EFI system partition",
+        "text": "FAT32"
+       },
+       {
+        "label": "Linux server or desktop",
+        "text": "ext4 or XFS; Btrfs for snapshots"
+       },
+       {
+        "label": "Mac startup or Mac-only",
+        "text": "APFS"
+       }
+      ]
+     },
+     "caption": "Start from where the data must be read and written, not from habit. Most 'file too large' and 'read-only on the Mac' tickets come from picking the wrong branch."
+    },
+    {
      "type": "flow",
      "items": [
       {
@@ -1859,8 +2263,45 @@ TRACK.modules.push({
     {
      "type": "callout",
      "kind": "warning",
-     "text": "When a vendor stops supporting an OS version, new vulnerabilities are never patched. Unsupported systems on a network are a standing risk. Keep a list of OS versions in use and their end-of-support dates, and plan upgrades a year ahead.",
+     "text": "When a vendor stops supporting an OS version, new vulnerabilities are never patched. Windows 10 reached end of support on 14 October 2025, so PCs that cannot move to Windows 11 need a dated plan: replacement, paid Extended Security Updates (ESU) as a short bridge, or another supported OS. Keep a list of OS versions in use with their end-of-support dates, and plan upgrades a year ahead.",
      "title": "End of support means end of security fixes"
+    },
+    {
+     "type": "timeline",
+     "title": "Desktop Windows support milestones",
+     "items": [
+      {
+       "when": "Jul 2015",
+       "label": "Windows 10 released",
+       "text": "Becomes the main business desktop for a decade."
+      },
+      {
+       "when": "Oct 2021",
+       "label": "Windows 11 released",
+       "text": "Needs TPM 2.0, UEFI with Secure Boot capability and a supported 64-bit CPU."
+      },
+      {
+       "when": "2024-2025",
+       "label": "Windows 11 24H2 and 25H2",
+       "text": "Each yearly version gets 24 months of support (Home, Pro) or 36 months (Enterprise, Education)."
+      },
+      {
+       "when": "14 Oct 2025",
+       "label": "Windows 10 end of support",
+       "text": "Free security updates stop; paid ESU is the only bridge."
+      },
+      {
+       "when": "Oct 2026",
+       "label": "Consumer ESU ends",
+       "text": "Business ESU can be renewed yearly, at rising cost."
+      },
+      {
+       "when": "Oct 2028",
+       "label": "Last year of business ESU",
+       "text": "No Windows 10 fixes after this; check the vendor's current timetable."
+      }
+     ],
+     "caption": "Plan replacements against these dates, not against the day a PC breaks. ESU buys time to migrate; it is not a long-term strategy."
     },
     {
      "type": "compare",
@@ -1945,6 +2386,17 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "The kernel, drivers and services do the same jobs on every OS, so concepts transfer.",
+      "Modern PCs use UEFI with GPT disks and Secure Boot; MBR is limited to 2 TiB.",
+      "Pick the file system by where it will be used: NTFS, exFAT, ext4/XFS or APFS.",
+      "Windows 10 support ended on 14 October 2025: track every OS's end-of-support date and plan ahead.",
+      "An unsupported OS still runs, but every new vulnerability stays open."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -2001,6 +2453,17 @@ TRACK.modules.push({
        ],
        "answer": 0,
        "explain": "Drivers are hardware-specific translators. The scheduler shares CPU time, the file system stores data and the boot loader starts the kernel."
+      },
+      {
+       "q": "A finance PC still runs Windows 10 in late 2026, and the organisation never bought ESU. Which statement is accurate?",
+       "options": [
+        "It will stop booting after the end-of-support date unless it is reinstalled",
+        "It gets no security fixes, so it should be upgraded, replaced or isolated",
+        "Its licence becomes invalid and it can no longer be activated or used legally",
+        "It keeps receiving security patches, but new apps can no longer be installed"
+       ],
+       "answer": 1,
+       "explain": "After end of support the OS keeps working but receives no security fixes, so it needs an upgrade, replacement or isolation plan. It does not stop booting, its licence stays valid and patches do not continue."
       }
      ]
     }
@@ -2097,6 +2560,51 @@ TRACK.modules.push({
       }
      ],
      "title": "Business-relevant Windows editions"
+    },
+    {
+     "type": "cli",
+     "device": "Windows PowerShell (elevated)",
+     "title": "Is this PC ready for Windows 11?",
+     "lines": [
+      "Get-Tpm | Select-Object TpmPresent, TpmReady, TpmEnabled",
+      "(Get-CimInstance -Namespace root/cimv2/security/microsofttpm -ClassName Win32_Tpm).SpecVersion   # must start with 2.0",
+      "Confirm-SecureBootUEFI          # True = on; an error usually means legacy BIOS mode",
+      "Get-ComputerInfo -Property OsName, OsVersion, BiosFirmwareType",
+      "Get-CimInstance Win32_Processor | Select-Object Name   # compare with the supported CPU list"
+     ],
+     "note": "A PC that reports no TPM often only needs firmware TPM (fTPM or PTT) and Secure Boot switched on in UEFI setup. Record the change on the asset."
+    },
+    {
+     "type": "tree",
+     "title": "A Windows 10 PC after end of support",
+     "root": {
+      "label": "Windows 10 PC",
+      "children": [
+       {
+        "label": "Meets Windows 11 requirements",
+        "text": "Pilot, then in-place upgrade"
+       },
+       {
+        "label": "TPM or Secure Boot switched off",
+        "text": "Enable in UEFI, recheck, upgrade"
+       },
+       {
+        "label": "Hardware not supported",
+        "text": "Plan replacement",
+        "children": [
+         {
+          "label": "Business apps needed",
+          "text": "Replace; ESU only while migrating"
+         },
+         {
+          "label": "Kiosk or lab use",
+          "text": "Reuse with a supported OS if apps allow"
+         }
+        ]
+       }
+      ]
+     },
+     "caption": "Check the requirements before condemning a PC: many 'unsupported' machines only need a firmware setting. Never leave an unsupported OS on the network without a dated plan."
     },
     {
      "type": "cli",
@@ -2234,6 +2742,17 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Event Viewer turns guesses into evidence: note the source, event ID and time.",
+      "Repair system files with DISM first, then sfc.",
+      "Use the least disruptive recovery option that fixes the fault, from rollback up to reimage.",
+      "Windows 11 needs TPM 2.0, Secure Boot-capable UEFI and a supported CPU; check before you upgrade or replace.",
+      "Keep UAC on and edit the registry only with a documented fix and a backup of the key."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -2290,6 +2809,17 @@ TRACK.modules.push({
        ],
        "answer": 3,
        "explain": "UAC requires consent for elevation, reducing silent misuse. It does not affect speed, Wi-Fi or encryption."
+      },
+      {
+       "q": "A 2020 desktop fails the Windows 11 check only because 'TPM 2.0 not detected'. Its CPU is on the supported list. What should you try first?",
+       "options": [
+        "Buy and fit a plug-in TPM module from an online marketplace first",
+        "Replace the motherboard and CPU with a newer supported generation",
+        "Keep Windows 10, since the PC still works and the data is safe",
+        "Turn on firmware TPM and Secure Boot in UEFI, then recheck"
+       ],
+       "answer": 3,
+       "explain": "Most PCs from that era have a firmware TPM that is simply switched off. Buying parts or replacing the board is unnecessary, and staying on Windows 10 leaves it unpatched."
       }
      ]
     }
@@ -2348,46 +2878,51 @@ TRACK.modules.push({
      "title": "Distribution families"
     },
     {
-     "type": "table",
-     "head": [
-      "Path",
-      "Holds"
-     ],
-     "rows": [
-      [
-       "/",
-       "The root of the whole tree"
-      ],
-      [
-       "/home",
-       "Users' personal folders"
-      ],
-      [
-       "/etc",
-       "System configuration files"
-      ],
-      [
-       "/var/log",
-       "Log files"
-      ],
-      [
-       "/usr/bin",
-       "Installed programs"
-      ],
-      [
-       "/tmp",
-       "Temporary files, often cleared at boot"
-      ],
-      [
-       "/root",
-       "The root user's home"
-      ],
-      [
-       "/mnt, /media",
-       "Mount points for extra disks and USB drives"
+     "type": "tree",
+     "title": "Key Linux directories",
+     "root": {
+      "label": "/",
+      "text": "Top of the tree; /root is the root user's home",
+      "children": [
+       {
+        "label": "/home",
+        "text": "Users' personal folders"
+       },
+       {
+        "label": "/etc",
+        "text": "System configuration files"
+       },
+       {
+        "label": "/var",
+        "text": "Data that changes",
+        "children": [
+         {
+          "label": "/var/log",
+          "text": "Log files"
+         }
+        ]
+       },
+       {
+        "label": "/usr",
+        "text": "Installed software",
+        "children": [
+         {
+          "label": "/usr/bin",
+          "text": "Programs"
+         }
+        ]
+       },
+       {
+        "label": "/tmp",
+        "text": "Temporary, often cleared at boot"
+       },
+       {
+        "label": "/mnt, /media",
+        "text": "Extra disks and USB drives"
+       }
       ]
-     ],
-     "title": "Key directories"
+     },
+     "caption": "Everything hangs from a single root, even extra disks, which are mounted into the tree. When a ticket mentions settings, look in /etc; when it mentions errors, look in /var/log or the journal."
     },
     {
      "type": "cli",
@@ -2397,7 +2932,7 @@ TRACK.modules.push({
       "ls -lah /var/log         # long listing incl. hidden files and sizes",
       "cd ~/Documents",
       "cat /etc/os-release      # distribution and version",
-      "tail -n 50 /var/log/syslog   # last 50 lines (Debian/Ubuntu)",
+      "tail -n 50 /var/log/syslog   # if rsyslog is installed; otherwise: journalctl -n 50",
       "grep -i error /var/log/syslog | tail -n 20",
       "du -sh ~/* | sort -h     # which folders use the most space"
      ],
@@ -2548,6 +3083,17 @@ TRACK.modules.push({
        "term": "systemd",
        "def": "The init and service manager on most modern Linux distributions, controlled with systemctl and logged with journalctl."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "A few dozen commands cover most Linux support work on any distribution.",
+      "Read permissions as owner, group, others; in numbers read = 4, write = 2, execute = 1.",
+      "Grant only the user or group that needs access; chmod 777 is never a fix.",
+      "Use apt or dnf for packages, systemctl for services and journalctl for logs.",
+      "Treat sudo and rm with respect: read every command twice."
      ]
     },
     {
@@ -2706,7 +3252,7 @@ TRACK.modules.push({
        "title": "Gatekeeper and updates",
        "items": [
         "Blocks unsigned or unnotarised apps by default",
-        "Rapid security responses patch urgent issues",
+        "Urgent security fixes can arrive between full updates",
         "Keep automatic updates on"
        ]
       }
@@ -2796,6 +3342,43 @@ TRACK.modules.push({
      "title": "Personal phones and company data"
     },
     {
+     "type": "matrix",
+     "title": "How much to manage a mobile device",
+     "x": "Company ownership of the device",
+     "y": "Sensitivity of the data on it",
+     "quadrants": [
+      {
+       "title": "Work profile + app protection",
+       "items": [
+        "Access only from approved apps",
+        "Selective wipe of company data"
+       ]
+      },
+      {
+       "title": "Full management (supervised)",
+       "items": [
+        "Encryption, passcode, compliance checks",
+        "Lock, locate and full wipe"
+       ]
+      },
+      {
+       "title": "Light touch",
+       "items": [
+        "Web or app access with MFA",
+        "No device enrolment"
+       ]
+      },
+      {
+       "title": "Standard baseline",
+       "items": [
+        "Automated enrolment",
+        "Standard apps and update rules"
+       ]
+      }
+     ],
+     "caption": "Control grows with data sensitivity and with company ownership. Personal phones that hold sensitive data get a work profile, not full device control, which respects privacy and still protects the data."
+    },
+    {
      "type": "scenario",
      "situation": "A marketing manager changed her network password on a Windows PC. Now her Mac keeps asking for her old password to unlock the keychain, and Wi-Fi and email prompts appear repeatedly.",
      "options": [
@@ -2853,6 +3436,17 @@ TRACK.modules.push({
        "term": "BYOD",
        "def": "Bring your own device: a policy that lets employees use personal devices for work under agreed controls."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "macOS has its own tools: Activity Monitor, Console, Disk Utility and Terminal (zsh).",
+      "FileVault recovery keys must be escrowed before anyone needs them.",
+      "Follow the recovery path from First Aid to erase-and-reinstall, backing up first.",
+      "MDM enrols, configures, monitors and can lock or wipe devices.",
+      "For BYOD, separate and wipe only company data."
      ]
     },
     {
@@ -2953,15 +3547,73 @@ TRACK.modules.push({
        ]
       },
       {
-       "title": "Image or automated provisioning",
+       "title": "Image or zero-touch provisioning",
        "items": [
-        "Standard image or cloud-based provisioning",
+        "Standard image, or a device registered to the organisation that sets itself up over the internet",
         "Consistent and fast at scale",
-        "Image must be kept updated"
+        "Images and profiles must be kept current"
        ]
       }
      ],
      "title": "Ways to deploy an operating system"
+    },
+    {
+     "type": "sequence",
+     "title": "Zero-touch provisioning of a company laptop",
+     "actors": [
+      "Supplier",
+      "New laptop",
+      "Enrolment service",
+      "Cloud MDM",
+      "User"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 2,
+       "label": "Registers serial to the organisation",
+       "note": "at purchase"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "First boot: who manages me?"
+      },
+      {
+       "from": 2,
+       "to": 1,
+       "label": "Your organisation's MDM",
+       "reply": true
+      },
+      {
+       "from": 4,
+       "to": 1,
+       "label": "Signs in with work account + MFA"
+      },
+      {
+       "from": 1,
+       "to": 3,
+       "label": "Enrols with MDM"
+      },
+      {
+       "from": 3,
+       "to": 1,
+       "label": "Policies, encryption, apps",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 3,
+       "label": "Reports compliance"
+      },
+      {
+       "from": 1,
+       "to": 4,
+       "label": "Desktop ready, apps installing",
+       "reply": true
+      }
+     ],
+     "caption": "The laptop never visits an IT bench: ownership is registered at purchase, and its first internet connection pulls the organisation's settings. Notice that the user's MFA sign-in is what ties the device to a person."
     },
     {
      "type": "steps",
@@ -3172,6 +3824,17 @@ TRACK.modules.push({
        "term": "Software licence",
        "def": "A legal agreement setting how software may be installed and used, such as per user, per device or volume."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Standard builds make every machine predictable and every rebuild fast.",
+      "Zero-touch provisioning ships devices straight to users and configures them over the internet.",
+      "Verify downloads with a published hash before you trust them.",
+      "Package managers (winget, apt, dnf) install and update software repeatably.",
+      "Test images and major updates in a VM with a snapshot first, and keep a record of every licence."
      ]
     },
     {
@@ -3449,6 +4112,30 @@ TRACK.modules.push({
      "title": "TCP versus UDP"
     },
     {
+     "type": "packet",
+     "title": "The UDP header: just 8 bytes",
+     "width": 32,
+     "fields": [
+      {
+       "label": "Source port",
+       "bits": 16
+      },
+      {
+       "label": "Destination port",
+       "bits": 16
+      },
+      {
+       "label": "Length",
+       "bits": 16
+      },
+      {
+       "label": "Checksum",
+       "bits": 16
+      }
+     ],
+     "caption": "UDP adds only ports, a length and a checksum: no sequence numbers and no acknowledgements. That is why it suits DNS and live calls, and why a lost UDP packet is simply gone."
+    },
+    {
      "type": "table",
      "head": [
       "Port",
@@ -3477,6 +4164,11 @@ TRACK.modules.push({
        "DHCP server / client"
       ],
       [
+       "123",
+       "UDP",
+       "NTP time synchronisation"
+      ],
+      [
        "80 / 443",
        "TCP (443 also UDP for QUIC)",
        "HTTP / HTTPS"
@@ -3498,6 +4190,67 @@ TRACK.modules.push({
       ]
      ],
      "title": "Ports every support specialist should know"
+    },
+    {
+     "type": "sequence",
+     "title": "What happens when a user opens a secure website",
+     "actors": [
+      "Laptop",
+      "DNS resolver",
+      "Web server"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Query: www.example.com (UDP 53)"
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "Answer: 203.0.113.10",
+       "reply": true
+      },
+      {
+       "from": 0,
+       "to": 2,
+       "label": "TCP SYN to port 443"
+      },
+      {
+       "from": 2,
+       "to": 0,
+       "label": "SYN-ACK",
+       "reply": true
+      },
+      {
+       "from": 0,
+       "to": 2,
+       "label": "ACK: connection open"
+      },
+      {
+       "from": 0,
+       "to": 2,
+       "label": "TLS ClientHello"
+      },
+      {
+       "from": 2,
+       "to": 0,
+       "label": "ServerHello + certificate",
+       "reply": true
+      },
+      {
+       "from": 0,
+       "to": 2,
+       "label": "HTTP GET / (encrypted)"
+      },
+      {
+       "from": 2,
+       "to": 0,
+       "label": "200 OK + page (encrypted)",
+       "reply": true
+      }
+     ],
+     "caption": "One click uses name resolution over UDP, a TCP handshake and then TLS before any web content moves; each is a separate place a fault can hide. Browsers using HTTP/3 replace the TCP step with QUIC over UDP 443."
     },
     {
      "type": "scenario",
@@ -3557,6 +4310,17 @@ TRACK.modules.push({
        "term": "Port number",
        "def": "A number that identifies a specific service or application on a host, such as 443 for HTTPS."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Switches forward frames by MAC address inside a LAN; routers forward packets between networks by IP.",
+      "Use OSI numbers as shorthand: Layer 1 is cables and radio, Layer 3 is addressing and routing.",
+      "Data is wrapped layer by layer: segment (ports), packet (IP), frame (MAC), signal.",
+      "TCP is reliable and ordered; UDP is fast and suits DNS, DHCP and live calls.",
+      "Know the everyday ports: 22, 53, 67/68, 123, 443, 445 and 3389."
      ]
     },
     {
@@ -3817,6 +4581,109 @@ TRACK.modules.push({
      "title": "The wrong gateway"
     },
     {
+     "type": "topology",
+     "title": "Two subnets joined by a router",
+     "nodes": [
+      {
+       "id": "inet",
+       "kind": "internet",
+       "label": "Internet",
+       "x": 3,
+       "y": 0
+      },
+      {
+       "id": "rtr",
+       "kind": "router",
+       "label": "Office router",
+       "sub": "default gateway for both",
+       "x": 3,
+       "y": 2
+      },
+      {
+       "id": "swa",
+       "kind": "switch",
+       "label": "Switch A",
+       "sub": "192.168.10.0/24",
+       "x": 1,
+       "y": 3
+      },
+      {
+       "id": "swb",
+       "kind": "switch",
+       "label": "Switch B",
+       "sub": "192.168.20.0/24",
+       "x": 5,
+       "y": 3
+      },
+      {
+       "id": "pc1",
+       "kind": "host",
+       "label": "Accounts PC",
+       "sub": "192.168.10.25",
+       "x": 0,
+       "y": 5
+      },
+      {
+       "id": "prn",
+       "kind": "host",
+       "label": "Printer",
+       "sub": "192.168.10.50",
+       "x": 2,
+       "y": 5
+      },
+      {
+       "id": "pc2",
+       "kind": "host",
+       "label": "Reception PC",
+       "sub": "192.168.20.45",
+       "x": 4,
+       "y": 5
+      },
+      {
+       "id": "srv",
+       "kind": "server",
+       "label": "Booking server",
+       "sub": "192.168.20.10",
+       "x": 6,
+       "y": 5
+      }
+     ],
+     "links": [
+      {
+       "a": "inet",
+       "b": "rtr",
+       "label": "public IP"
+      },
+      {
+       "a": "rtr",
+       "b": "swa",
+       "label": "gw 192.168.10.1"
+      },
+      {
+       "a": "rtr",
+       "b": "swb",
+       "label": "gw 192.168.20.1"
+      },
+      {
+       "a": "swa",
+       "b": "pc1"
+      },
+      {
+       "a": "swa",
+       "b": "prn"
+      },
+      {
+       "a": "swb",
+       "b": "pc2"
+      },
+      {
+       "a": "swb",
+       "b": "srv"
+      }
+     ],
+     "caption": "Hosts reach anything in their own subnet directly, but everything else goes to the gateway, which must sit inside that same subnet. The receptionist's mistyped gateway, 192.168.2.1, exists in neither subnet, so only local traffic worked."
+    },
+    {
      "type": "cli",
      "device": "Windows PowerShell",
      "lines": [
@@ -3919,6 +4786,17 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Check four values on every 'no internet' ticket: IP address, mask, gateway and DNS.",
+      "Addresses = 2^(32 - prefix); usable hosts = that number minus 2.",
+      "Use the block size (256 minus the mask octet) to find network and broadcast addresses fast.",
+      "169.254.x.x means DHCP never answered; 127.x is loopback.",
+      "IPv6 is 128-bit hexadecimal; every interface also has an fe80:: link-local address."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -3997,30 +4875,69 @@ TRACK.modules.push({
      "text": "People remember names, computers use addresses. **DNS** translates names such as `intranet.company.local` into IP addresses. **DHCP** hands out IP settings automatically. When either fails, users see 'the internet is down' even though cables, switches and routers are fine. That makes these two services the most valuable to understand deeply."
     },
     {
-     "type": "flow",
-     "items": [
+     "type": "sequence",
+     "title": "How a name is resolved",
+     "actors": [
+      "Laptop",
+      "Resolver",
+      "Root server",
+      ".com TLD",
+      "Authoritative"
+     ],
+     "steps": [
       {
-       "label": "Local cache",
-       "text": "The OS checks its DNS cache and hosts file."
+       "from": 0,
+       "to": 0,
+       "label": "Check cache and hosts file"
       },
       {
-       "label": "Resolver",
-       "text": "Asks the configured DNS server (often internal)."
+       "from": 0,
+       "to": 1,
+       "label": "www.example.com?"
       },
       {
-       "label": "Root",
-       "text": "If not cached, the resolver asks a root server where .com lives."
+       "from": 1,
+       "to": 2,
+       "label": "www.example.com?",
+       "note": "only if not cached"
       },
       {
-       "label": "TLD",
-       "text": "The .com servers point to the domain's authoritative servers."
+       "from": 2,
+       "to": 1,
+       "label": "Ask the .com servers",
+       "reply": true
       },
       {
-       "label": "Authoritative",
-       "text": "Returns the answer, which is cached for its TTL."
+       "from": 1,
+       "to": 3,
+       "label": "www.example.com?"
+      },
+      {
+       "from": 3,
+       "to": 1,
+       "label": "Ask example.com's name servers",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 4,
+       "label": "www.example.com?"
+      },
+      {
+       "from": 4,
+       "to": 1,
+       "label": "A 203.0.113.10, TTL 3600",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "203.0.113.10",
+       "reply": true,
+       "note": "resolver caches it for the TTL"
       }
      ],
-     "title": "How a name is resolved"
+     "caption": "The laptop asks one question and gets one answer; the resolver does the walking. Caching at every step is why a changed record can take up to one TTL to be seen everywhere."
     },
     {
      "type": "table",
@@ -4099,26 +5016,45 @@ TRACK.modules.push({
      "title": "TTL (time to live)"
     },
     {
-     "type": "flow",
-     "items": [
+     "type": "sequence",
+     "title": "DHCP: the DORA exchange",
+     "actors": [
+      "New laptop",
+      "DHCP server"
+     ],
+     "steps": [
       {
-       "label": "Discover",
-       "text": "Client broadcasts: is there a DHCP server?"
+       "from": 0,
+       "to": 1,
+       "label": "DHCPDISCOVER (broadcast)",
+       "note": "from 0.0.0.0 to 255.255.255.255"
       },
       {
-       "label": "Offer",
-       "text": "Server offers an address and settings."
+       "from": 1,
+       "to": 0,
+       "label": "DHCPOFFER: 192.168.10.120",
+       "reply": true,
+       "note": "plus mask, gateway, DNS, lease"
       },
       {
-       "label": "Request",
-       "text": "Client asks to use the offered address."
+       "from": 0,
+       "to": 1,
+       "label": "DHCPREQUEST: I accept .120",
+       "note": "broadcast so other servers know"
       },
       {
-       "label": "Acknowledge",
-       "text": "Server confirms and starts the lease."
+       "from": 1,
+       "to": 0,
+       "label": "DHCPACK: lease starts",
+       "reply": true
+      },
+      {
+       "from": 0,
+       "to": 0,
+       "label": "Configures IP; renews at 50% of lease"
       }
      ],
-     "title": "DHCP: the DORA exchange"
+     "caption": "Discover and Request are broadcasts because the client has no address yet, which is why routers need a DHCP relay to serve other subnets. If no Offer arrives, the client falls back to a 169.254 address."
     },
     {
      "type": "table",
@@ -4240,6 +5176,17 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "If IP addresses work but names fail, suspect DNS first.",
+      "A, AAAA, CNAME, MX, TXT, PTR and NS records each answer a different question.",
+      "TTL controls caching: lower it before a planned change and flush client caches after.",
+      "DHCP follows Discover, Offer, Request, Acknowledge; reservations keep printers on fixed addresses.",
+      "Fix wrong settings at the DHCP scope so every client gets the correction at renewal."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -4342,13 +5289,19 @@ TRACK.modules.push({
        "Wi-Fi 6 / 6E",
        "802.11ax",
        "2.4, 5 and 6 GHz (6E)",
-       "Better in crowded spaces; 6E adds clean 6 GHz channels"
+       "Better in crowded spaces; 6E adds clean 6 GHz channels and requires WPA3 there"
       ],
       [
        "Wi-Fi 7",
        "802.11be",
        "2.4, 5 and 6 GHz",
-       "Wider channels and multi-link operation"
+       "Up to 320 MHz channels in 6 GHz and multi-link operation (MLO) across bands"
+      ],
+      [
+       "Wi-Fi 8 (in development)",
+       "802.11bn",
+       "2.4, 5 and 6 GHz",
+       "Aims at reliability rather than peak speed; not yet a purchasing factor"
       ]
      ],
      "title": "Wi-Fi generations"
@@ -4460,26 +5413,174 @@ TRACK.modules.push({
      "title": "Setting up a small office router securely"
     },
     {
-     "type": "flow",
-     "items": [
+     "type": "topology",
+     "title": "A secure small office network",
+     "nodes": [
       {
-       "label": "Inside host",
-       "text": "192.168.1.25 sends a request to a website."
-      },
-      {
-       "label": "Router translates",
-       "text": "Replaces the source with its public address and a unique port."
-      },
-      {
+       "id": "inet",
+       "kind": "internet",
        "label": "Internet",
-       "text": "The website replies to the public address."
+       "x": 3,
+       "y": 0
       },
       {
-       "label": "Router maps back",
-       "text": "Uses its translation table to send the reply to 192.168.1.25."
+       "id": "fw",
+       "kind": "firewall",
+       "label": "Office router",
+       "sub": "firewall, NAT, DHCP",
+       "x": 3,
+       "y": 2
+      },
+      {
+       "id": "sw",
+       "kind": "switch",
+       "label": "Switch",
+       "sub": "staff LAN 192.168.1.0/24",
+       "x": 1,
+       "y": 3
+      },
+      {
+       "id": "ap",
+       "kind": "ap",
+       "label": "Access point",
+       "sub": "SSIDs: Staff, Guest",
+       "x": 5,
+       "y": 3
+      },
+      {
+       "id": "nas",
+       "kind": "storage",
+       "label": "NAS",
+       "sub": "192.168.1.10",
+       "x": 0,
+       "y": 5
+      },
+      {
+       "id": "prn",
+       "kind": "host",
+       "label": "Printer",
+       "sub": "reserved .50",
+       "x": 2,
+       "y": 5
+      },
+      {
+       "id": "lap",
+       "kind": "laptop",
+       "label": "Staff laptop",
+       "sub": "WPA3, 5/6 GHz",
+       "x": 4,
+       "y": 5
+      },
+      {
+       "id": "gst",
+       "kind": "phone",
+       "label": "Guest phone",
+       "sub": "internet only",
+       "x": 6,
+       "y": 5
       }
      ],
-     "title": "NAT on a small office router"
+     "links": [
+      {
+       "a": "inet",
+       "b": "fw",
+       "label": "fibre WAN"
+      },
+      {
+       "a": "fw",
+       "b": "sw",
+       "label": "LAN"
+      },
+      {
+       "a": "fw",
+       "b": "ap",
+       "label": "staff + guest"
+      },
+      {
+       "a": "sw",
+       "b": "nas"
+      },
+      {
+       "a": "sw",
+       "b": "prn"
+      },
+      {
+       "a": "ap",
+       "b": "lap",
+       "label": "Staff SSID",
+       "style": "wireless"
+      },
+      {
+       "a": "ap",
+       "b": "gst",
+       "label": "Guest SSID",
+       "style": "wireless"
+      }
+     ],
+     "zones": [
+      {
+       "label": "Staff network",
+       "x": 0,
+       "y": 3,
+       "w": 5,
+       "h": 3,
+       "tone": "good"
+      },
+      {
+       "label": "Guest",
+       "x": 6,
+       "y": 4,
+       "w": 1,
+       "h": 2,
+       "tone": "warn"
+      }
+     ],
+     "caption": "One router and one access point carry two separate networks. Staff devices share the LAN with the NAS and printer, while guests land in their own segment with a path to the internet only."
+    },
+    {
+     "type": "sequence",
+     "title": "NAT on a small office router",
+     "actors": [
+      "PC 192.168.1.25",
+      "Office router (NAT)",
+      "Website 198.51.100.20"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 1,
+       "label": "From 192.168.1.25:51000 to :443"
+      },
+      {
+       "from": 1,
+       "to": 1,
+       "label": "Rewrite source to 203.0.113.5:62001",
+       "note": "entry saved in the NAT table"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "From 203.0.113.5:62001 to :443"
+      },
+      {
+       "from": 2,
+       "to": 1,
+       "label": "Reply to 203.0.113.5:62001",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 1,
+       "label": "Look up :62001 in the NAT table"
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "Deliver to 192.168.1.25:51000",
+       "reply": true
+      }
+     ],
+     "caption": "Many inside devices share one public address because the router tracks each conversation by port. Unsolicited inbound traffic has no table entry, which is why reaching an inside device needs port forwarding, and why that is risky."
     },
     {
      "type": "callout",
@@ -4568,6 +5669,17 @@ TRACK.modules.push({
        "term": "Port forwarding",
        "def": "A router rule that sends inbound traffic on a public port to a specific internal device."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Prefer 5 or 6 GHz for staff devices; on 2.4 GHz use only channels 1, 6 and 11.",
+      "Use WPA3 (or 802.1X for organisations); WEP and TKIP are broken.",
+      "Isolate guests on their own SSID and segment with internet-only access.",
+      "Harden every small office router: new admin password, current firmware, WPS and UPnP off.",
+      "Never port-forward RDP or camera pages; use a VPN or secure remote-access service."
      ]
     },
     {
@@ -4737,6 +5849,40 @@ TRACK.modules.push({
      "title": "Reading common results"
     },
     {
+     "type": "tree",
+     "title": "'The internet is down': where is the fault?",
+     "root": {
+      "label": "Run the five checks in order",
+      "children": [
+       {
+        "label": "Link down",
+        "text": "Cable, switch port, Wi-Fi association"
+       },
+       {
+        "label": "169.254 or no IP",
+        "text": "DHCP, VLAN, exhausted scope"
+       },
+       {
+        "label": "Gateway ping fails",
+        "text": "Local switch, VLAN, host firewall"
+       },
+       {
+        "label": "External IP fails",
+        "text": "Router or ISP link; check status"
+       },
+       {
+        "label": "Names fail",
+        "text": "DNS servers; test with Resolve-DnsName or dig"
+       },
+       {
+        "label": "One service fails",
+        "text": "Port test, service status, firewall rule"
+       }
+      ]
+     },
+     "caption": "Stop at the first check that fails: that branch tells you where the fault lives and who to involve. Everything to its left has already been proven to work."
+    },
+    {
      "type": "callout",
      "kind": "insight",
      "text": "Many servers and firewalls block ICMP, so a failed ping does not always mean a host is down. Confirm with a port test to the service the user actually needs, such as HTTPS on 443.",
@@ -4878,6 +6024,17 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Turn vague reports into facts with the same five checks every time.",
+      "A failed ping is not proof a host is down; test the real service port.",
+      "Traceroute shows where a path breaks, which tells you who to escalate to.",
+      "Loss above about 1-2% or high, variable latency ruins voice and video.",
+      "Write down every test and result so nobody repeats them."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -4971,45 +6128,40 @@ TRACK.modules.push({
      "text": "Experienced support staff are not faster because they know every answer. They are faster because they follow the same method every time: they gather facts before acting, change one thing at a time and confirm the result. Guessing feels quick but often creates new problems, especially on systems other people depend on."
     },
     {
-     "type": "framework",
+     "type": "cycle",
+     "title": "The ZITSS seven-step troubleshooting method",
+     "center": "Evidence first",
      "items": [
       {
-       "label": "1",
-       "title": "Identify",
+       "label": "Identify",
        "text": "Gather facts: symptoms, error messages, scope, timing and recent changes. Reproduce if you can. Back up data before risky work."
       },
       {
-       "label": "2",
-       "title": "Theorise",
+       "label": "Theorise",
        "text": "List probable causes, starting with the most likely and easiest to test. Question the obvious."
       },
       {
-       "label": "3",
-       "title": "Test",
+       "label": "Test",
        "text": "Test one theory at a time. If it is disproved, move to the next or escalate."
       },
       {
-       "label": "4",
-       "title": "Plan",
+       "label": "Plan",
        "text": "Decide how to fix it, considering impact, approvals, change windows and rollback."
       },
       {
-       "label": "5",
-       "title": "Implement",
+       "label": "Implement",
        "text": "Apply the fix, or escalate with your evidence."
       },
       {
-       "label": "6",
-       "title": "Verify",
+       "label": "Verify",
        "text": "Confirm full functionality with the user and add preventive measures."
       },
       {
-       "label": "7",
-       "title": "Document",
+       "label": "Document",
        "text": "Record symptoms, cause, actions and outcome in the ticket and knowledge base."
       }
      ],
-     "title": "The ZITSS seven-step troubleshooting method"
+     "caption": "The method is a loop: a disproved theory sends you back to Theorise, and what you document feeds the next Identify. Never skip Verify or Document to save time."
     },
     {
      "type": "table",
@@ -5074,6 +6226,42 @@ TRACK.modules.push({
       }
      ],
      "title": "Good theories versus weak theories"
+    },
+    {
+     "type": "matrix",
+     "title": "Which theory to test first",
+     "x": "Effort or risk to test",
+     "y": "Likelihood it explains the evidence",
+     "quadrants": [
+      {
+       "title": "Test first",
+       "items": [
+        "Recent change, new add-in",
+        "Cable, sign-in, power"
+       ]
+      },
+      {
+       "title": "Plan, then test",
+       "items": [
+        "Needs a change window or approval",
+        "Prepare rollback"
+       ]
+      },
+      {
+       "title": "Quick checks along the way",
+       "items": [
+        "Restart the app",
+        "Try another port or browser"
+       ]
+      },
+      {
+       "title": "Test last or escalate",
+       "items": [
+        "Rebuilds and hardware swaps on a hunch"
+       ]
+      }
+     ],
+     "caption": "Rank theories by how likely they are and how cheap and safe they are to test. Likely, cheap tests come first; expensive, unlikely ones come last or go to a specialist."
     },
     {
      "type": "callout",
@@ -5177,6 +6365,17 @@ TRACK.modules.push({
        "term": "Root cause",
        "def": "The underlying reason a problem occurred, which, if fixed, prevents it recurring."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Gather facts first: symptoms, scope, timing and recent changes.",
+      "Scope is the fastest clue: one user, one team or everyone points to different places.",
+      "Test the most likely, cheapest theory first, and change one thing at a time.",
+      "Escalate with evidence and stay the user's contact until it is fixed.",
+      "Close only after the user confirms and the root cause and fix are documented."
      ]
     },
     {
@@ -5349,6 +6548,60 @@ TRACK.modules.push({
      "title": "Remote support done right"
     },
     {
+     "type": "sequence",
+     "title": "A legitimate remote support session",
+     "actors": [
+      "User",
+      "Technician",
+      "Remote tool"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Reports issue; ticket logged"
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "Calls back on the known number",
+       "note": "IT starts contact, not a stranger"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "Opens session for this ticket"
+      },
+      {
+       "from": 2,
+       "to": 0,
+       "label": "Consent prompt: allow viewing?"
+      },
+      {
+       "from": 0,
+       "to": 2,
+       "label": "Approves"
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "Explains each step while working"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "Ends session; log saved"
+      },
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Confirms the fix",
+       "reply": true
+      }
+     ],
+     "caption": "Real support starts from a ticket, is initiated by IT through an approved, logged tool and needs the user's consent each time. A caller who reverses this order and asks the user to install something is running the classic support scam."
+    },
+    {
      "type": "framework",
      "items": [
       {
@@ -5412,6 +6665,36 @@ TRACK.modules.push({
      "answer": "**Technique:** timeline and change analysis: failures follow the Sunday reboot every week, and the spooler start type was changed two months ago. **Root cause:** after the weekly reboot the spooler does not start automatically; it only starts when an administrator restarts the server or someone starts the service manually. **Fix:** set the spooler to Automatic (with recovery options to restart on failure), add a service health check after maintenance reboots, raise a problem record noting who changed the start type and why, and add 'verify key services after patch reboot' to the patching checklist."
     },
     {
+     "type": "tree",
+     "title": "Fishbone, drawn as a tree: Monday printing failures",
+     "root": {
+      "label": "Users cannot print on Monday mornings",
+      "children": [
+       {
+        "label": "People",
+        "text": "Start type changed with no record"
+       },
+       {
+        "label": "Process",
+        "text": "No service check after patch reboots"
+       },
+       {
+        "label": "Technology",
+        "text": "Spooler set to Manual start"
+       },
+       {
+        "label": "Environment",
+        "text": "Sunday 03:00 maintenance reboot"
+       },
+       {
+        "label": "Suppliers",
+        "text": "Updates require a restart"
+       }
+      ]
+     },
+     "caption": "Grouping candidate causes by category stops a team fixating on technology alone. The Manual start type is the technical fault, but the missing post-reboot check is what let it recur every week."
+    },
+    {
      "type": "scenario",
      "situation": "Twelve identical laptops in a finance team freeze for several seconds a few times a day. Twelve laptops of a different model are fine. All run the same image.",
      "options": [
@@ -5469,6 +6752,17 @@ TRACK.modules.push({
        "term": "Problem record",
        "def": "A record that tracks the investigation of the underlying cause of one or more incidents."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Shrink the search area with half-split, known-good swaps, moving the problem and comparison.",
+      "Collect evidence from logs, recent updates and boot times before changing anything.",
+      "Remote sessions need an approved, logged tool, the user's consent and a ticket.",
+      "Unsolicited 'support' calls asking users to install tools are scams: refuse and report.",
+      "Root-cause tools (five whys, fishbone, timeline, change analysis) target process gaps, not people."
      ]
     },
     {
@@ -5631,6 +6925,43 @@ TRACK.modules.push({
      "title": "Choosing the right channel"
     },
     {
+     "type": "matrix",
+     "title": "Picking a channel for the moment",
+     "x": "Urgency",
+     "y": "Complexity or emotion",
+     "quadrants": [
+      {
+       "title": "Scheduled call or visit",
+       "items": [
+        "Training, a new device",
+        "A sensitive conversation"
+       ]
+      },
+      {
+       "title": "Phone or video now",
+       "items": [
+        "Outage before a deadline",
+        "An upset or vulnerable user"
+       ]
+      },
+      {
+       "title": "Portal, email or KB",
+       "items": [
+        "Requests and how-to questions",
+        "Routine status updates"
+       ]
+      },
+      {
+       "title": "Chat",
+       "items": [
+        "Quick guided fix",
+        "One step at a time"
+       ]
+      }
+     ],
+     "caption": "Match the channel to the urgency and the emotional weight of the issue. Whatever channel you use, confirm the outcome in writing in the ticket."
+    },
+    {
      "type": "steps",
      "items": [
       {
@@ -5759,6 +7090,17 @@ TRACK.modules.push({
        "term": "Confidentiality",
        "def": "Keeping private any information you see or hear while supporting users."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Solve the human problem as well as the technical one: Listen, Empathise, Act, Promise.",
+      "Translate jargon into what the user will see and what they need to do.",
+      "Choose the channel by urgency and emotion, and confirm in writing.",
+      "Keep every promised update time, even when there is no fix yet.",
+      "Respect confidentiality: what you see on a user's screen stays private."
      ]
     },
     {
@@ -5927,6 +7269,39 @@ TRACK.modules.push({
      "title": "A simple priority matrix"
     },
     {
+     "type": "matrix",
+     "title": "Impact and urgency at a glance",
+     "x": "Urgency",
+     "y": "Impact",
+     "quadrants": [
+      {
+       "title": "P3 Medium: plan it soon",
+       "items": [
+        "A team affected, workaround exists"
+       ]
+      },
+      {
+       "title": "P1 or P2: act now",
+       "items": [
+        "Clinic registration down, patients queuing"
+       ]
+      },
+      {
+       "title": "P4 Low",
+       "items": [
+        "Request for a new mouse"
+       ]
+      },
+      {
+       "title": "P3 Medium: quick fix",
+       "items": [
+        "One user, meeting in 10 minutes"
+       ]
+      }
+     ],
+     "caption": "Seniority and volume of complaints are not on either axis. Set priority from impact and urgency, then let the SLA targets follow from the priority."
+    },
+    {
      "type": "table",
      "head": [
       "Priority",
@@ -5991,6 +7366,79 @@ TRACK.modules.push({
       }
      ],
      "title": "Ticket lifecycle"
+    },
+    {
+     "type": "sequence",
+     "title": "A ticket from first contact to closure",
+     "actors": [
+      "User",
+      "Virtual agent",
+      "Service desk",
+      "Tier 2"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 1,
+       "label": "'Payroll app will not open'"
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "Suggests a KB article",
+       "reply": true
+      },
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Still failing"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "Creates ticket with a summary"
+      },
+      {
+       "from": 2,
+       "to": 2,
+       "label": "Checks summary; sets P2",
+       "note": "a person verifies the AI draft"
+      },
+      {
+       "from": 2,
+       "to": 0,
+       "label": "Ticket number + next update time",
+       "reply": true
+      },
+      {
+       "from": 2,
+       "to": 3,
+       "label": "Escalates with evidence"
+      },
+      {
+       "from": 3,
+       "to": 0,
+       "label": "Fix applied: please test"
+      },
+      {
+       "from": 0,
+       "to": 3,
+       "label": "Confirmed working",
+       "reply": true
+      },
+      {
+       "from": 2,
+       "to": 2,
+       "label": "Resolves, links KB, closes"
+      }
+     ],
+     "caption": "A virtual agent can deflect simple issues and draft the ticket, but a person checks its summary and priority before work starts. Notice that the user hears something at every hand-off."
+    },
+    {
+     "type": "callout",
+     "kind": "warning",
+     "title": "AI assistants need human verification",
+     "text": "Many service desks now use AI assistants to suggest articles, summarise long tickets and draft replies. Treat every suggestion as a draft: check facts and commands before anyone runs them, never paste passwords or personal data into unapproved tools, and never let an assistant approve identity checks, access or MFA changes. The technician who sends the reply owns it."
     },
     {
      "type": "callout",
@@ -6109,6 +7557,17 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Classify work correctly: incident, service request, problem or change.",
+      "Priority comes from impact and urgency, never from seniority alone.",
+      "SLA targets, FCR and compliance turn service quality into numbers you can improve.",
+      "Write ticket notes a stranger could act on at 2 am.",
+      "AI assistants can draft and summarise, but a person verifies before anything is sent or changed."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -6165,6 +7624,17 @@ TRACK.modules.push({
        ],
        "answer": 3,
        "explain": "It states symptom, cause, action and confirmation."
+      },
+      {
+       "q": "An AI assistant drafts a reply telling a user to make a registry change and switch off a security tool. What should the technician do?",
+       "options": [
+        "Send it, since the assistant was trained on the vendor's documentation",
+        "Check and test the steps, remove unsafe ones, then send it",
+        "Ask the assistant whether its own answer is correct, then send it",
+        "Forward it to the user and ask them to judge whether it looks safe"
+       ],
+       "answer": 1,
+       "explain": "The technician owns every reply: verify the steps and remove anything unsafe, such as disabling protection. The assistant cannot check itself, and users cannot judge technical safety."
       }
      ]
     }
@@ -6343,15 +7813,15 @@ TRACK.exam.push([
  },
  {
   "module": "m2",
-  "q": "A Mac in the design team is slow. Which tool should the technician open first to see which process is using CPU and memory?",
+  "q": "In late 2026 a company still has 60 Windows 10 PCs and bought no Extended Security Updates. Twenty of them fail the Windows 11 check only because TPM and Secure Boot are switched off in firmware. What should the support team do first for those twenty?",
   "options": [
-   "Activity Monitor",
-   "Disk Utility",
-   "Keychain Access",
-   "Time Machine backups"
+   "Enable firmware TPM and Secure Boot, recheck, then pilot the upgrade",
+   "Replace all 60 PCs at once, since none of them can be trusted any more",
+   "Keep them on Windows 10 because they still boot and work normally",
+   "Turn off the update service so the old version stays stable"
   ],
   "answer": 0,
-  "explain": "Activity Monitor shows per-process CPU, memory and energy use. Disk Utility repairs disks, Keychain stores passwords and Time Machine handles backup."
+  "explain": "These twenty only need a firmware setting before a normal, piloted upgrade, which ends their unpatched state quickly. Replacing everything wastes money, staying on Windows 10 leaves known holes open and blocking updates makes it worse."
  },
  {
   "module": "m3",

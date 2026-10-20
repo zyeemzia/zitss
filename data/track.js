@@ -32,14 +32,14 @@ TRACK.meta = {
     "title": "Capstone: Run IT support for a small organisation for one simulated month",
     "brief": "Take on the role of the only IT support specialist for a realistic 40-person organisation (for example a garment buying house in Dhaka, a private clinic in Sylhet or a university department in Chattogram). Using virtual machines, a free cloud tenant or a home lab, set up, support, secure and document its IT, then hand it over as if you were leaving for a new job.",
     "deliverables": [
-      "Hardware and software inventory with lifecycle dates for at least 15 assets",
+      "Hardware and software inventory with lifecycle and OS end-of-support dates for at least 15 assets",
       "Build sheet for a standard workstation image (Windows or Linux) with installed software and settings",
       "Network diagram with addressing, DHCP scope, DNS records and Wi-Fi settings",
       "Ten worked support tickets: categorised, prioritised, troubleshot, communicated and closed",
       "User and group design with folder permissions based on least privilege",
-      "Backup plan using the 3-2-1 rule, plus evidence of one successful test restore",
+      "Backup plan using the 3-2-1-1-0 rule (one immutable or offline copy), plus evidence of one successful test restore",
       "Patch and update schedule with a pilot group and rollback plan",
-      "Security baseline: password and MFA policy, endpoint protection, phishing awareness note",
+      "Security baseline: password, MFA and passkey policy, endpoint protection, phishing awareness note",
       "Two scripts (one PowerShell, one Bash) that automate a real support task, with comments",
       "Knowledge-base articles for three common problems and a one-page handover document"
     ],

@@ -66,6 +66,47 @@ TRACK.modules.push({
      "title": "Assign to groups, not to people"
     },
     {
+     "type": "tree",
+     "title": "Group-based access to a finance folder",
+     "root": {
+      "label": "\\\\fs01\\Finance",
+      "text": "Permissions set on groups only",
+      "children": [
+       {
+        "label": "GRP-Finance-RW",
+        "text": "Modify",
+        "children": [
+         {
+          "label": "Accountants",
+          "text": "Added by role at joining"
+         }
+        ]
+       },
+       {
+        "label": "GRP-Finance-RO",
+        "text": "Read",
+        "children": [
+         {
+          "label": "External auditor",
+          "text": "Named account, expires in 3 weeks"
+         }
+        ]
+       },
+       {
+        "label": "GRP-IT-Admins",
+        "text": "Full control",
+        "children": [
+         {
+          "label": "Admin accounts",
+          "text": "Separate from daily accounts"
+         }
+        ]
+       }
+      ]
+     },
+     "caption": "Permissions are granted once, to groups; people join or leave groups as their role changes. A new accountant needs one change, and the auditor's access ends automatically with her account."
+    },
+    {
      "type": "cli",
      "device": "Windows PowerShell",
      "lines": [
@@ -255,6 +296,17 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Every person gets their own account; admins also get a separate admin account.",
+      "Grant permissions to role groups, never to individuals one by one.",
+      "Over the network, the most restrictive of share and NTFS permissions applies, and an explicit deny wins.",
+      "Run joiner, mover and leaver steps on the day they happen to stop privilege creep.",
+      "Temporary access gets a named account, approval and an expiry date."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -428,7 +480,7 @@ TRACK.modules.push({
        "title": "Cloud identity",
        "items": [
         "Identity provider hosted as a service",
-        "SSO and MFA for SaaS apps",
+        "SSO, MFA and passkeys for SaaS apps",
         "Devices joined and managed over the internet"
        ]
       },
@@ -437,11 +489,112 @@ TRACK.modules.push({
        "items": [
         "On-premises accounts synchronised to the cloud",
         "One password for local and cloud resources",
-        "The most common model in 2026"
+        "Very common in 2026; many newer organisations start cloud-only"
        ]
       }
      ],
      "title": "Identity models"
+    },
+    {
+     "type": "topology",
+     "title": "Hybrid identity in one picture",
+     "nodes": [
+      {
+       "id": "idp",
+       "kind": "idp",
+       "label": "Cloud identity",
+       "sub": "SSO, MFA, conditional access",
+       "x": 1,
+       "y": 0
+      },
+      {
+       "id": "saas",
+       "kind": "cloud",
+       "label": "SaaS apps",
+       "sub": "mail, files, HR, CRM",
+       "x": 4,
+       "y": 0
+      },
+      {
+       "id": "dc",
+       "kind": "server",
+       "label": "Domain controller",
+       "sub": "on-premises directory",
+       "x": 1,
+       "y": 3
+      },
+      {
+       "id": "pc",
+       "kind": "host",
+       "label": "Domain PC",
+       "sub": "Kerberos sign-in",
+       "x": 0,
+       "y": 5
+      },
+      {
+       "id": "lap",
+       "kind": "laptop",
+       "label": "Cloud laptop",
+       "sub": "managed by MDM",
+       "x": 3,
+       "y": 5
+      },
+      {
+       "id": "ph",
+       "kind": "phone",
+       "label": "Phone",
+       "sub": "authenticator or passkey",
+       "x": 5,
+       "y": 5
+      }
+     ],
+     "links": [
+      {
+       "a": "dc",
+       "b": "idp",
+       "label": "directory sync"
+      },
+      {
+       "a": "idp",
+       "b": "saas",
+       "label": "SSO + SCIM"
+      },
+      {
+       "a": "pc",
+       "b": "dc",
+       "label": "Kerberos"
+      },
+      {
+       "a": "lap",
+       "b": "idp",
+       "label": "sign-in"
+      },
+      {
+       "a": "ph",
+       "b": "idp",
+       "label": "MFA",
+       "style": "dashed"
+      }
+     ],
+     "zones": [
+      {
+       "label": "Cloud",
+       "x": 1,
+       "y": 0,
+       "w": 4,
+       "h": 1,
+       "tone": "accent"
+      },
+      {
+       "label": "On-premises",
+       "x": 0,
+       "y": 3,
+       "w": 2,
+       "h": 3,
+       "tone": "neutral"
+      }
+     ],
+     "caption": "Accounts are created once on-premises and synchronised to the cloud identity provider, which signs users in to every SaaS app with SSO and MFA. A cloud-only organisation simply has no on-premises zone."
     },
     {
      "type": "cli",
@@ -482,6 +635,65 @@ TRACK.modules.push({
       }
      ],
      "title": "Safe password reset procedure"
+    },
+    {
+     "type": "sequence",
+     "title": "Password reset with identity verification",
+     "actors": [
+      "Caller",
+      "Service desk",
+      "Directory"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 1,
+       "label": "'Locked out, please reset my password'"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "Look up account and registered phone"
+      },
+      {
+       "from": 2,
+       "to": 1,
+       "label": "Locked; phone number on file",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "Calls back on the registered number",
+       "note": "never the number the caller gives"
+      },
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Passes verification (call-back + code)"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "Unlock, temporary password, must change"
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "Temporary password via secure channel"
+      },
+      {
+       "from": 0,
+       "to": 2,
+       "label": "Signs in, sets a new password"
+      },
+      {
+       "from": 1,
+       "to": 1,
+       "label": "Records how identity was verified"
+      }
+     ],
+     "caption": "The desk, not the caller, decides how identity is proven, using contact details already on record. The temporary password works once, so IT never knows the user's real password."
     },
     {
      "type": "callout",
@@ -558,6 +770,17 @@ TRACK.modules.push({
        "term": "Account lockout",
        "def": "A security control that disables sign-in temporarily after too many failed password attempts."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "A directory holds users, groups, computers and policy in one place; domain PCs find it through DNS.",
+      "Hybrid identity syncs on-premises accounts to a cloud identity provider for SSO and MFA.",
+      "Verify identity with details already on record before any reset or MFA change.",
+      "Repeated lockouts usually mean a device still holds an old password.",
+      "Record who asked, how identity was verified and what was changed."
      ]
     },
     {
@@ -665,6 +888,45 @@ TRACK.modules.push({
      "title": "Policy processing order on a domain-joined Windows PC"
     },
     {
+     "type": "tree",
+     "title": "Where policies are linked in a typical domain",
+     "root": {
+      "label": "company.local",
+      "text": "GPO: password and lockout rules",
+      "children": [
+       {
+        "label": "OU Dhaka",
+        "text": "GPO: branch printers",
+        "children": [
+         {
+          "label": "OU Laptops",
+          "text": "GPO: disk encryption"
+         },
+         {
+          "label": "OU Staff",
+          "text": "GPO: drive maps, screen lock"
+         }
+        ]
+       },
+       {
+        "label": "OU Chattogram",
+        "text": "GPO: branch printers",
+        "children": [
+         {
+          "label": "OU Laptops",
+          "text": "GPO: disk encryption"
+         }
+        ]
+       },
+       {
+        "label": "OU Servers",
+        "text": "GPO: server baseline"
+       }
+      ]
+     },
+     "caption": "An object receives every policy linked on the path from the domain down to its own OU, and the closest link wins conflicts. Moving an object to another OU silently changes its policy set."
+    },
+    {
      "type": "compare",
      "columns": [
       {
@@ -723,8 +985,9 @@ TRACK.modules.push({
        "title": "Cloud device management (MDM)",
        "items": [
         "Configuration profiles pushed over the internet",
-        "Works for laptops outside the office",
-        "Also manages macOS, iOS and Android"
+        "Works for laptops that never visit the office",
+        "Manages Windows, macOS, iOS and Android",
+        "Compliance results can gate sign-in (conditional access)"
        ]
       },
       {
@@ -745,6 +1008,61 @@ TRACK.modules.push({
       }
      ],
      "title": "Configuration management beyond the domain"
+    },
+    {
+     "type": "sequence",
+     "title": "Conditional access: device health gates sign-in",
+     "actors": [
+      "Laptop",
+      "Cloud MDM",
+      "Identity provider",
+      "SaaS app"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Reports: encrypted, patched, AV on"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "Device marked compliant"
+      },
+      {
+       "from": 0,
+       "to": 3,
+       "label": "Opens mail app"
+      },
+      {
+       "from": 3,
+       "to": 0,
+       "label": "Redirect to sign-in",
+       "reply": true
+      },
+      {
+       "from": 0,
+       "to": 2,
+       "label": "Sign-in + MFA from this laptop"
+      },
+      {
+       "from": 2,
+       "to": 2,
+       "label": "Policy: user, MFA, device all OK"
+      },
+      {
+       "from": 2,
+       "to": 0,
+       "label": "Access token issued",
+       "reply": true
+      },
+      {
+       "from": 0,
+       "to": 3,
+       "label": "Access with token"
+      }
+     ],
+     "caption": "The same password and MFA from an unmanaged or out-of-date device can be blocked or limited. When a user is 'blocked for no reason', check the device's compliance status first."
     },
     {
      "type": "steps",
@@ -861,6 +1179,17 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Define settings once and apply them automatically: consistency makes support easier.",
+      "On a domain, policies apply local, site, domain, then OU, and the closest OU usually wins.",
+      "Use gpresult to see what actually applied, and check OU, filtering and DNS when it did not.",
+      "Cloud MDM manages devices anywhere, and its compliance results can gate sign-in.",
+      "Pilot every new policy, roll out in stages and record it in a policy register."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -967,7 +1296,96 @@ TRACK.modules.push({
        "text": "Backups verified and restores tested on a schedule."
       }
      ],
-     "title": "The 3-2-1 rule (plus 1 and 0)"
+     "title": "The 3-2-1-1-0 rule"
+    },
+    {
+     "type": "topology",
+     "title": "3-2-1-1-0 in a small office",
+     "nodes": [
+      {
+       "id": "cloud",
+       "kind": "cloud",
+       "label": "Cloud storage",
+       "sub": "copy 3: off site, immutable",
+       "x": 3,
+       "y": 0
+      },
+      {
+       "id": "fs",
+       "kind": "server",
+       "label": "File server",
+       "sub": "copy 1: live data",
+       "x": 1,
+       "y": 2
+      },
+      {
+       "id": "nas",
+       "kind": "storage",
+       "label": "NAS",
+       "sub": "copy 2: on site, versioned",
+       "x": 5,
+       "y": 2
+      },
+      {
+       "id": "log",
+       "kind": "doc",
+       "label": "Restore test log",
+       "sub": "monthly tests, zero errors",
+       "x": 1,
+       "y": 4
+      },
+      {
+       "id": "con",
+       "kind": "monitor",
+       "label": "Backup console",
+       "sub": "alerts on any failure",
+       "x": 5,
+       "y": 4
+      }
+     ],
+     "links": [
+      {
+       "a": "fs",
+       "b": "nas",
+       "label": "nightly backup"
+      },
+      {
+       "a": "nas",
+       "b": "cloud",
+       "label": "replicate, object lock",
+       "style": "tunnel"
+      },
+      {
+       "a": "log",
+       "b": "fs",
+       "label": "test restores",
+       "style": "dashed"
+      },
+      {
+       "a": "con",
+       "b": "nas",
+       "label": "job status"
+      }
+     ],
+     "zones": [
+      {
+       "label": "Off site",
+       "x": 2,
+       "y": 0,
+       "w": 3,
+       "h": 1,
+       "tone": "good"
+      },
+      {
+       "label": "Office",
+       "x": 0,
+       "y": 2,
+       "w": 7,
+       "h": 3,
+       "tone": "neutral"
+      }
+     ],
+     "caption": "Copy 2 is fast to restore on site; copy 3 is off site and immutable, so ransomware on the office network cannot alter it. The restore test log is the zero: proof that restores really work."
     },
     {
      "type": "table",
@@ -1143,7 +1561,7 @@ TRACK.modules.push({
      "items": [
       {
        "term": "3-2-1 rule",
-       "def": "A backup principle: three copies of data, on two types of media, with one copy off site."
+       "def": "A backup principle: three copies of data, on two types of media, with one copy off site; often extended to 3-2-1-1-0 with one offline or immutable copy and zero restore errors."
       },
       {
        "term": "Incremental backup",
@@ -1169,6 +1587,17 @@ TRACK.modules.push({
        "term": "Test restore",
        "def": "A planned recovery of backed-up data to prove backups work and measure restore time."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Backups exist to restore: agree RPO and RTO with data owners, system by system.",
+      "Follow 3-2-1-1-0: three copies, two media, one off site, one immutable or offline, zero errors.",
+      "Sync, RAID and snapshots are not backups on their own.",
+      "A backup that anything on the infected network can write to can be encrypted too.",
+      "Only a timed, verified test restore proves a backup works."
      ]
     },
     {
@@ -1250,7 +1679,9 @@ TRACK.modules.push({
      "text": "Most successful attacks use vulnerabilities for which a patch already existed. Patching is not glamorous, but it is one of the most effective security controls a support team owns. The challenge is speed with safety: apply updates quickly, while making sure a bad update does not stop a hospital, a factory or a bank branch."
     },
     {
-     "type": "flow",
+     "type": "cycle",
+     "title": "The patch management cycle",
+     "center": "Every month, and on demand",
      "items": [
       {
        "label": "Inventory",
@@ -1277,7 +1708,7 @@ TRACK.modules.push({
        "text": "Track compliance and exceptions."
       }
      ],
-     "title": "The patch management cycle"
+     "caption": "Reporting feeds the next inventory, so the loop never ends. Emergency patches run the same cycle in hours instead of weeks."
     },
     {
      "type": "table",
@@ -1316,6 +1747,35 @@ TRACK.modules.push({
      "title": "Deployment rings"
     },
     {
+     "type": "chart",
+     "kind": "line",
+     "title": "Devices updated during a ring rollout (illustrative)",
+     "labels": [
+      "Day 0",
+      "Day 2",
+      "Day 5",
+      "Day 7",
+      "Day 10",
+      "Day 14"
+     ],
+     "series": [
+      {
+       "name": "Devices updated",
+       "values": [
+        2,
+        10,
+        15,
+        55,
+        85,
+        97
+       ]
+      }
+     ],
+     "unit": "%",
+     "yLabel": "% of devices",
+     "caption": "Illustrative numbers. Coverage stays low while the test and pilot rings prove the update, then climbs steeply in the broad ring; the last few percent are critical systems and stragglers that need follow-up."
+    },
+    {
      "type": "formula",
      "items": [
       {
@@ -1334,7 +1794,7 @@ TRACK.modules.push({
     {
      "type": "callout",
      "kind": "warning",
-     "text": "When a vulnerability is being actively exploited, normal timelines shrink to hours or days. Follow the emergency change process: quick risk assessment, accelerated pilot, deployment to exposed systems first (internet-facing servers, VPN gateways) and close monitoring.",
+     "text": "When a vulnerability is being actively exploited, normal timelines shrink to hours or days. Follow the emergency change process: quick risk assessment, accelerated pilot, deployment to exposed systems first (internet-facing servers, VPN gateways) and close monitoring. Public catalogues of known exploited vulnerabilities help decide which patches jump the queue.",
      "title": "Emergency patches"
     },
     {
@@ -1370,7 +1830,7 @@ TRACK.modules.push({
       "**Network and security appliances**: firewalls and VPN gateways are prime targets.",
       "**Third-party apps**: browsers, document readers, runtimes, conferencing tools.",
       "**Mobile devices**: enforce minimum OS versions through MDM.",
-      "**Unsupported systems**: isolate them and plan replacement."
+      "**Unsupported systems**, such as Windows 10 PCs without ESU: isolate them and plan replacement."
      ],
      "title": "Do not forget"
     },
@@ -1469,6 +1929,17 @@ TRACK.modules.push({
        "term": "Firmware update",
        "def": "An update to the low-level software stored on hardware such as motherboards, SSDs, printers and network devices."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Patching is one of the most effective controls a support team owns.",
+      "Know your inventory, then test, pilot and deploy in rings.",
+      "Actively exploited flaws on internet-facing systems go through the emergency process within days.",
+      "Patch firmware, appliances and third-party apps, not only the OS.",
+      "When an update breaks something, pause the rollout, roll back the affected devices and communicate."
      ]
     },
     {
@@ -1679,30 +2150,56 @@ TRACK.modules.push({
      "title": "Checking services on a Linux server"
     },
     {
-     "type": "flow",
-     "items": [
+     "type": "sequence",
+     "title": "What happens when a user opens a shared file",
+     "actors": [
+      "User PC",
+      "DNS",
+      "Domain controller",
+      "File server"
+     ],
+     "steps": [
       {
-       "label": "Name lookup",
-       "text": "DNS resolves fs01.company.local."
+       "from": 0,
+       "to": 1,
+       "label": "fs01.company.local?"
       },
       {
-       "label": "Authentication",
-       "text": "The directory confirms the user's identity."
+       "from": 1,
+       "to": 0,
+       "label": "10.0.5.20",
+       "reply": true
       },
       {
-       "label": "Connect",
-       "text": "SMB connection to TCP 445 on the file server."
+       "from": 0,
+       "to": 2,
+       "label": "Kerberos: ticket for fs01, please"
       },
       {
-       "label": "Authorise",
-       "text": "Share and NTFS permissions are checked."
+       "from": 2,
+       "to": 0,
+       "label": "Service ticket",
+       "reply": true,
+       "note": "only if clocks agree within minutes"
       },
       {
-       "label": "Open",
-       "text": "The file is opened and locked for editing."
+       "from": 0,
+       "to": 3,
+       "label": "SMB connect, TCP 445 + ticket"
+      },
+      {
+       "from": 3,
+       "to": 3,
+       "label": "Check share and NTFS permissions"
+      },
+      {
+       "from": 3,
+       "to": 0,
+       "label": "File opened and locked for editing",
+       "reply": true
       }
      ],
-     "title": "What happens when a user opens a shared file"
+     "caption": "Four services take part before the file appears, so 'the S: drive is broken' could be DNS, time, the directory or permissions. Test them in this order."
     },
     {
      "type": "scenario",
@@ -1762,6 +2259,17 @@ TRACK.modules.push({
        "term": "Server room",
        "def": "A secured, cooled and powered space that houses servers and network equipment."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Know what each shared service does and how its failure looks to users.",
+      "Clock drift breaks Kerberos sign-in and certificates: check time sync early.",
+      "Servers add redundancy (PSUs, ECC, RAID) and out-of-band management.",
+      "Use scope to choose between one queue, one server or a shared service.",
+      "Gather service status and logs before escalating to the infrastructure team."
      ]
     },
     {
@@ -1956,6 +2464,31 @@ TRACK.modules.push({
      "title": "RAID capacity"
     },
     {
+     "type": "chart",
+     "kind": "bar",
+     "title": "Usable capacity from six 8 TB disks",
+     "labels": [
+      "RAID 0",
+      "RAID 5",
+      "RAID 6",
+      "RAID 10"
+     ],
+     "series": [
+      {
+       "name": "Usable",
+       "values": [
+        48,
+        40,
+        32,
+        24
+       ]
+      }
+     ],
+     "unit": " TB",
+     "yLabel": "TB usable",
+     "caption": "Exact usable capacity before formatting. Protection costs capacity: RAID 6 gives up two disks to survive two failures, and RAID 10 gives up half for speed."
+    },
+    {
      "type": "callout",
      "kind": "warning",
      "text": "When a disk fails, the array rebuilds onto a replacement by reading every other disk. With large disks this can take a day or more, and a second failure during a RAID 5 rebuild loses the array. Replace failed disks promptly and keep backups current.",
@@ -1990,6 +2523,87 @@ TRACK.modules.push({
       }
      ],
      "title": "Storage options"
+    },
+    {
+     "type": "topology",
+     "title": "Two virtualisation hosts sharing storage",
+     "nodes": [
+      {
+       "id": "sw",
+       "kind": "switch",
+       "label": "Core switch",
+       "sub": "VM and user traffic",
+       "x": 3,
+       "y": 0
+      },
+      {
+       "id": "ha",
+       "kind": "server",
+       "label": "Host A",
+       "sub": "hypervisor: APP01, WEB01",
+       "x": 1,
+       "y": 2
+      },
+      {
+       "id": "hb",
+       "kind": "server",
+       "label": "Host B",
+       "sub": "hypervisor: DB01, FS01",
+       "x": 5,
+       "y": 2
+      },
+      {
+       "id": "st",
+       "kind": "storage",
+       "label": "Shared storage",
+       "sub": "NAS or SAN, RAID 6",
+       "x": 3,
+       "y": 4
+      },
+      {
+       "id": "bk",
+       "kind": "storage",
+       "label": "Backup target",
+       "sub": "separate device",
+       "x": 6,
+       "y": 5
+      }
+     ],
+     "links": [
+      {
+       "a": "sw",
+       "b": "ha",
+       "label": "10 GbE"
+      },
+      {
+       "a": "sw",
+       "b": "hb",
+       "label": "10 GbE"
+      },
+      {
+       "a": "ha",
+       "b": "hb",
+       "label": "live migration",
+       "style": "dashed"
+      },
+      {
+       "a": "ha",
+       "b": "st",
+       "label": "iSCSI / NFS"
+      },
+      {
+       "a": "hb",
+       "b": "st",
+       "label": "iSCSI / NFS"
+      },
+      {
+       "a": "st",
+       "b": "bk",
+       "label": "nightly copy",
+       "style": "dashed"
+      }
+     ],
+     "caption": "Because both hosts see the same storage, a VM can move to the other host for maintenance or restart there after a host failure. The shared array then becomes a single point of failure, so it needs RAID, monitoring and a separate backup."
     },
     {
      "type": "cli",
@@ -2079,6 +2693,17 @@ TRACK.modules.push({
        "term": "Checkpoint (VM snapshot)",
        "def": "A saved point-in-time state of a VM that can be reverted to quickly, intended for short-term use."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Type 1 hypervisors run production servers; type 2 suit labs and testing.",
+      "Containers share the host kernel and start in seconds; VMs bring their own OS.",
+      "Choose RAID by what must survive: RAID 6 for large disks, RAID 10 for speed, never RAID 0 for data.",
+      "Shared storage lets VMs move between hosts but must itself be protected and backed up.",
+      "Snapshots are short-term undo buttons, not backups."
      ]
     },
     {
@@ -2266,6 +2891,102 @@ TRACK.modules.push({
      "title": "Shared responsibility"
     },
     {
+     "type": "topology",
+     "title": "One organisation, three service models",
+     "nodes": [
+      {
+       "id": "saas",
+       "kind": "cloud",
+       "label": "SaaS suite",
+       "sub": "mail, files, chat",
+       "x": 1,
+       "y": 0
+      },
+      {
+       "id": "idp",
+       "kind": "idp",
+       "label": "Identity",
+       "sub": "SSO, MFA, access",
+       "x": 3,
+       "y": 0
+      },
+      {
+       "id": "fw",
+       "kind": "firewall",
+       "label": "Cloud firewall",
+       "sub": "allows 443 only",
+       "x": 5,
+       "y": 1
+      },
+      {
+       "id": "vm",
+       "kind": "vm",
+       "label": "App VM",
+       "sub": "IaaS: you patch the OS",
+       "x": 4,
+       "y": 3
+      },
+      {
+       "id": "db",
+       "kind": "db",
+       "label": "Managed DB",
+       "sub": "PaaS: provider patches",
+       "x": 6,
+       "y": 3
+      },
+      {
+       "id": "staff",
+       "kind": "team",
+       "label": "Staff",
+       "sub": "office and remote",
+       "x": 2,
+       "y": 4
+      }
+     ],
+     "links": [
+      {
+       "a": "staff",
+       "b": "saas",
+       "label": "HTTPS"
+      },
+      {
+       "a": "staff",
+       "b": "idp",
+       "label": "sign-in + MFA"
+      },
+      {
+       "a": "idp",
+       "b": "saas",
+       "label": "SSO"
+      },
+      {
+       "a": "staff",
+       "b": "fw",
+       "label": "HTTPS"
+      },
+      {
+       "a": "fw",
+       "b": "vm"
+      },
+      {
+       "a": "vm",
+       "b": "db",
+       "label": "SQL"
+      }
+     ],
+     "zones": [
+      {
+       "label": "Cloud network (IaaS / PaaS)",
+       "x": 4,
+       "y": 1,
+       "w": 3,
+       "h": 3,
+       "tone": "accent"
+      }
+     ],
+     "caption": "The same organisation consumes SaaS, runs its own VM on IaaS and uses a managed database on PaaS. Who patches what differs per box, but identities, access and data are the customer's in every one."
+    },
+    {
      "type": "callout",
      "kind": "warning",
      "text": "In every model, **you** own your accounts, MFA, permissions and data. A misconfigured public storage bucket or a shared admin password is the customer's failure, not the provider's. Many cloud breaches are configuration mistakes.",
@@ -2380,6 +3101,17 @@ TRACK.modules.push({
        "term": "Resource tag",
        "def": "A key-value label attached to a cloud resource to record owner, cost centre, environment or purpose."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "SaaS, PaaS and IaaS differ in how much you still manage.",
+      "Whatever the model, accounts, MFA, permissions and data stay your responsibility.",
+      "Many cloud breaches are configuration mistakes, not provider failures.",
+      "Cloud costs accrue every hour a resource runs: schedule, right-size and delete idle resources.",
+      "Tag every resource with owner, cost centre, environment and expiry."
      ]
     },
     {
@@ -2539,30 +3271,59 @@ TRACK.modules.push({
      "title": "Licence management basics"
     },
     {
-     "type": "flow",
-     "items": [
+     "type": "sequence",
+     "title": "How an email reaches a user",
+     "actors": [
+      "Sender's server",
+      "DNS",
+      "Recipient mail service",
+      "User's mailbox"
+     ],
+     "steps": [
       {
-       "label": "Sender",
-       "text": "The sending server looks up the domain's MX record."
+       "from": 0,
+       "to": 1,
+       "label": "MX for company.com?"
       },
       {
-       "label": "Inbound filtering",
-       "text": "Spam, malware and authentication checks (SPF, DKIM, DMARC)."
+       "from": 1,
+       "to": 0,
+       "label": "mx1.provider.example",
+       "reply": true
       },
       {
-       "label": "Rules",
-       "text": "Transport and mailbox rules may redirect or block."
+       "from": 0,
+       "to": 2,
+       "label": "SMTP: deliver message (TLS)"
       },
       {
-       "label": "Mailbox",
-       "text": "Message lands in inbox, junk or quarantine."
+       "from": 2,
+       "to": 1,
+       "label": "Sender's SPF, DKIM key, DMARC?"
       },
       {
-       "label": "Client",
-       "text": "Desktop, web or mobile app syncs the mailbox."
+       "from": 1,
+       "to": 2,
+       "label": "TXT records",
+       "reply": true
+      },
+      {
+       "from": 2,
+       "to": 2,
+       "label": "Spam, malware, auth checks; rules"
+      },
+      {
+       "from": 2,
+       "to": 3,
+       "label": "Inbox, junk or quarantine"
+      },
+      {
+       "from": 3,
+       "to": 3,
+       "label": "Clients sync: desktop, web, mobile"
       }
      ],
-     "title": "How an email reaches a user"
+     "caption": "Most 'missing email' tickets are answered at step 6: the message arrived but was filtered, quarantined or redirected by a rule. Message trace shows exactly which step a message reached."
     },
     {
      "type": "compare",
@@ -2588,7 +3349,7 @@ TRACK.modules.push({
        "items": [
         "Read the status code and text",
         "Mailbox full, address wrong, or blocked by policy",
-        "Failed SPF or DMARC checks"
+        "Failed SPF, DKIM or DMARC checks; large mailbox providers have required all three from bulk senders since 2024"
        ]
       }
      ],
@@ -2713,6 +3474,17 @@ TRACK.modules.push({
        "term": "Retention policy",
        "def": "A rule that keeps or deletes data for a defined period to meet legal or business needs."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Tenant admins create users, assign licences, fix mail flow and control sharing.",
+      "Offboard in order: block sign-in and revoke sessions first, reclaim the licence last.",
+      "Use message trace, quarantine and SPF/DKIM/DMARC results for missing mail.",
+      "Block automatic external forwarding and watch for new forwarding rules.",
+      "Prefer named guest access with expiry over 'anyone with the link'."
      ]
     },
     {
@@ -2862,6 +3634,33 @@ TRACK.modules.push({
      "title": "Availability maths"
     },
     {
+     "type": "chart",
+     "kind": "bar",
+     "title": "Downtime allowed per year",
+     "labels": [
+      "99%",
+      "99.5%",
+      "99.9%",
+      "99.95%",
+      "99.99%"
+     ],
+     "series": [
+      {
+       "name": "Allowed downtime",
+       "values": [
+        87.6,
+        43.8,
+        8.76,
+        4.38,
+        0.88
+       ]
+      }
+     ],
+     "unit": " h",
+     "yLabel": "hours per year",
+     "caption": "Exact values from (1 - availability) x 8,760 hours. Each extra nine cuts allowed downtime tenfold, and usually raises the cost of redundancy sharply."
+    },
+    {
      "type": "layers",
      "items": [
       {
@@ -2929,6 +3728,126 @@ TRACK.modules.push({
       }
      ],
      "title": "Remote access options"
+    },
+    {
+     "type": "topology",
+     "title": "Secure remote access without exposed ports",
+     "nodes": [
+      {
+       "id": "staff",
+       "kind": "laptop",
+       "label": "Remote staff",
+       "sub": "managed, compliant",
+       "x": 1,
+       "y": 0
+      },
+      {
+       "id": "vend",
+       "kind": "user",
+       "label": "Vendor engineer",
+       "sub": "named, time-limited",
+       "x": 5,
+       "y": 0
+      },
+      {
+       "id": "inet",
+       "kind": "internet",
+       "label": "Internet",
+       "x": 3,
+       "y": 1
+      },
+      {
+       "id": "gw",
+       "kind": "firewall",
+       "label": "Access gateway",
+       "sub": "VPN or per-app, MFA",
+       "x": 1,
+       "y": 3
+      },
+      {
+       "id": "bas",
+       "kind": "server",
+       "label": "Bastion host",
+       "sub": "RDP/SSH entry, logged",
+       "x": 5,
+       "y": 3
+      },
+      {
+       "id": "idp",
+       "kind": "idp",
+       "label": "Identity",
+       "sub": "MFA and device check",
+       "x": 3,
+       "y": 4
+      },
+      {
+       "id": "apps",
+       "kind": "process",
+       "label": "Internal apps",
+       "sub": "intranet, ERP",
+       "x": 1,
+       "y": 5
+      },
+      {
+       "id": "img",
+       "kind": "server",
+       "label": "Imaging server",
+       "sub": "vendor-supported",
+       "x": 5,
+       "y": 5
+      }
+     ],
+     "links": [
+      {
+       "a": "staff",
+       "b": "inet"
+      },
+      {
+       "a": "vend",
+       "b": "inet"
+      },
+      {
+       "a": "inet",
+       "b": "gw",
+       "label": "TLS"
+      },
+      {
+       "a": "inet",
+       "b": "bas",
+       "label": "TLS"
+      },
+      {
+       "a": "gw",
+       "b": "idp",
+       "style": "dashed"
+      },
+      {
+       "a": "bas",
+       "b": "idp",
+       "style": "dashed"
+      },
+      {
+       "a": "gw",
+       "b": "apps",
+       "label": "per-app"
+      },
+      {
+       "a": "bas",
+       "b": "img",
+       "label": "RDP, recorded"
+      }
+     ],
+     "zones": [
+      {
+       "label": "Organisation network",
+       "x": 0,
+       "y": 3,
+       "w": 7,
+       "h": 3,
+       "tone": "neutral"
+      }
+     ],
+     "caption": "Nothing internal is reachable directly: every path enters through a gateway or bastion that checks identity, MFA and device health and logs the session. The vendor's account works only during the agreed window."
     },
     {
      "type": "cli",
@@ -3021,6 +3940,17 @@ TRACK.modules.push({
        "term": "Bastion host",
        "def": "A hardened server that acts as the controlled entry point for administrative remote access."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Good monitoring finds problems before users do; every alert needs an owner and a runbook.",
+      "Availability = (total time - downtime) / total time; each extra nine costs far more.",
+      "Remove single points of failure layer by layer, from power to sites.",
+      "Never expose RDP or SSH directly; use a VPN, zero-trust gateway or bastion with MFA.",
+      "Give vendors named, time-limited, logged access."
      ]
     },
     {
@@ -3190,6 +4120,42 @@ TRACK.modules.push({
      "title": "Simple risk scoring"
     },
     {
+     "type": "matrix",
+     "title": "Deciding what to do with a risk",
+     "x": "Likelihood",
+     "y": "Impact",
+     "quadrants": [
+      {
+       "title": "Plan for it",
+       "items": [
+        "Server-room fire or flood",
+        "Off-site backups, recovery plan"
+       ]
+      },
+      {
+       "title": "Treat now",
+       "items": [
+        "Unpatched internet-facing server",
+        "Patch, MFA, monitoring"
+       ]
+      },
+      {
+       "title": "Accept and review",
+       "items": [
+        "A lost low-value accessory"
+       ]
+      },
+      {
+       "title": "Reduce cheaply",
+       "items": [
+        "Lost visitor badges",
+        "Badge expiry, sign-out at reception"
+       ]
+      }
+     ],
+     "caption": "Place each risk by likelihood and impact before choosing a control. High-high risks need action now; rare disasters need plans and backups rather than daily effort."
+    },
+    {
      "type": "callout",
      "kind": "definition",
      "text": "Give every account, person and program only the access it needs to do its job, for only as long as it needs it. Least privilege limits the damage from mistakes, malware and stolen credentials.",
@@ -3283,6 +4249,57 @@ TRACK.modules.push({
      "title": "Admins are prime targets"
     },
     {
+     "type": "sequence",
+     "title": "How a help-desk social engineering attack works",
+     "actors": [
+      "Attacker",
+      "Help desk",
+      "Identity provider",
+      "Mailbox"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 0,
+       "label": "Researches staff on social media"
+      },
+      {
+       "from": 0,
+       "to": 1,
+       "label": "'I'm the CFO, new phone, urgent!'"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "Resets password, adds new MFA device",
+       "note": "the step verification must stop"
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "New password read out on the call",
+       "reply": true
+      },
+      {
+       "from": 0,
+       "to": 2,
+       "label": "Signs in with the new MFA device"
+      },
+      {
+       "from": 2,
+       "to": 0,
+       "label": "Session token issued",
+       "reply": true
+      },
+      {
+       "from": 0,
+       "to": 3,
+       "label": "Reads mail, adds a forwarding rule"
+      }
+     ],
+     "caption": "No malware is needed: one rushed reset hands over the account. Verifying identity with details already on record at step 3 breaks the whole chain."
+    },
+    {
      "type": "scenario",
      "situation": "You see a man in a contractor's vest near the server room door at a Gazipur factory. He says he is 'here to check the air conditioning' but has no visitor badge and no one told you about a visit.",
      "options": [
@@ -3340,6 +4357,17 @@ TRACK.modules.push({
        "term": "Social engineering",
        "def": "Manipulating people into revealing information or performing actions that weaken security."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Every support decision has a confidentiality, integrity or availability side.",
+      "Risk = likelihood x impact; treat the highest scores first.",
+      "Least privilege and defence in depth limit the damage of any single failure.",
+      "Help desks are prime social-engineering targets: verify identity every time, especially under pressure.",
+      "Physical security is everyone's job: lock screens, challenge politely, stop tailgating."
      ]
     },
     {
@@ -3435,14 +4463,20 @@ TRACK.modules.push({
       {
        "title": "Modern practice",
        "items": [
-        "Long passphrases (at least 12-15 characters)",
-        "Change only when compromise is suspected",
+        "Long passphrases: at least 15 characters when a password is the only factor",
+        "No forced symbol rules or scheduled changes; change on compromise",
         "Block common and breached passwords",
-        "Use a password manager for unique passwords everywhere"
+        "Password manager for unique passwords; passkeys wherever offered"
        ]
       }
      ],
      "title": "Password guidance: then and now"
+    },
+    {
+     "type": "callout",
+     "kind": "insight",
+     "title": "What current guidance says",
+     "text": "The 2025 revision of a widely used digital identity standard (NIST SP 800-63B) tells organisations not to force periodic password changes or composition rules, to screen new passwords against breached lists, and to accept long passphrases, with at least 15 characters when a password is used on its own. Many regulators and auditors now follow the same approach."
     },
     {
      "type": "formula",
@@ -3501,6 +4535,56 @@ TRACK.modules.push({
      "kind": "insight",
      "text": "Attackers with a stolen password send dozens of push prompts at night, hoping the user taps 'Approve' to make them stop. Teach users: **never approve a prompt you did not start**, and report it. Number matching and phishing-resistant methods stop most of these attacks.",
      "title": "MFA fatigue attacks"
+    },
+    {
+     "type": "sequence",
+     "title": "How a passkey sign-in works",
+     "actors": [
+      "User",
+      "Phone or laptop",
+      "Website"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 2,
+       "label": "Sign in as nadia@company.example"
+      },
+      {
+       "from": 2,
+       "to": 1,
+       "label": "Random challenge for this site",
+       "reply": true,
+       "note": "a fake site has a different origin"
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "Unlock with fingerprint or PIN"
+      },
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Approves"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "Challenge signed with private key"
+      },
+      {
+       "from": 2,
+       "to": 2,
+       "label": "Checks it with stored public key"
+      },
+      {
+       "from": 2,
+       "to": 0,
+       "label": "Signed in; no password sent",
+       "reply": true
+      }
+     ],
+     "caption": "The private key never leaves the device, and the signature only works for the genuine site, so a phishing page has nothing to steal or replay. If the device is lost, recovery goes through verified identity, never a quick reset."
     },
     {
      "type": "keypoints",
@@ -3648,6 +4732,17 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Length beats complexity: long passphrases plus a password manager.",
+      "Drop forced periodic changes and composition rules; block breached passwords instead.",
+      "Prefer phishing-resistant MFA: passkeys and FIDO2 keys; number matching for push.",
+      "Never approve a prompt you did not start; unexpected prompts mean the password is known.",
+      "Separate admin accounts, just-in-time elevation and unique local admin passwords protect privileged access."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -3704,6 +4799,17 @@ TRACK.modules.push({
        ],
        "answer": 3,
        "explain": "Unique rotated passwords stop one stolen password unlocking every device."
+      },
+      {
+       "q": "A small organisation is updating its password policy to current guidance. Which existing rule should it drop?",
+       "options": [
+        "Checking new passwords against lists of breached passwords",
+        "Forcing every password to change every 60 days",
+        "Allowing long passphrases that contain spaces",
+        "Requiring MFA for email and remote access"
+       ],
+       "answer": 1,
+       "explain": "Scheduled changes push people towards weak, predictable passwords, so current guidance drops them and changes passwords only on compromise. Breach screening, long passphrases and MFA all stay."
       }
      ]
     }
@@ -3779,7 +4885,8 @@ TRACK.modules.push({
       "Links whose real destination (hover to check) differs from the text.",
       "Unexpected attachments, especially archives, macro documents or HTML files.",
       "Requests to change bank details, buy gift cards or bypass normal process.",
-      "Generic greetings and unusual language for that sender."
+      "Generic greetings and unusual language for that sender.",
+      "QR codes or voice messages that rush you to a sign-in page or payment; text and even voices can now be AI-generated."
      ],
      "title": "Red flags in a phishing message"
     },
@@ -3788,6 +4895,92 @@ TRACK.modules.push({
      "kind": "example",
      "text": "A Chattogram importer received an email that looked like it came from a long-standing supplier asking for 'updated bank details'. The domain had one letter changed. The accounts officer phoned the supplier on the number in their files, not the one in the email, and avoided losing a USD 48,000 payment.",
      "title": "Payment diversion fraud"
+    },
+    {
+     "type": "topology",
+     "title": "How a phishing attack unfolds",
+     "nodes": [
+      {
+       "id": "att",
+       "kind": "attacker",
+       "label": "Attacker",
+       "sub": "lookalike domain",
+       "x": 1,
+       "y": 0
+      },
+      {
+       "id": "fake",
+       "kind": "cloud",
+       "label": "Fake login page",
+       "sub": "harvests password + code",
+       "x": 5,
+       "y": 0
+      },
+      {
+       "id": "flt",
+       "kind": "shield",
+       "label": "Mail filter",
+       "sub": "catches most, not all",
+       "x": 1,
+       "y": 3
+      },
+      {
+       "id": "idp",
+       "kind": "idp",
+       "label": "Real sign-in",
+       "sub": "attacker replays session",
+       "x": 5,
+       "y": 3
+      },
+      {
+       "id": "lap",
+       "kind": "laptop",
+       "label": "User laptop",
+       "sub": "clicks the link",
+       "x": 1,
+       "y": 5
+      },
+      {
+       "id": "mbx",
+       "kind": "db",
+       "label": "Mailbox",
+       "sub": "rules, invoice fraud",
+       "x": 5,
+       "y": 5
+      }
+     ],
+     "links": [
+      {
+       "a": "att",
+       "b": "flt",
+       "label": "phishing email",
+       "style": "attack"
+      },
+      {
+       "a": "flt",
+       "b": "lap",
+       "label": "delivered"
+      },
+      {
+       "a": "lap",
+       "b": "fake",
+       "label": "clicks link",
+       "style": "attack"
+      },
+      {
+       "a": "fake",
+       "b": "idp",
+       "label": "replays login",
+       "style": "attack"
+      },
+      {
+       "a": "idp",
+       "b": "mbx",
+       "label": "takes over",
+       "style": "attack"
+      }
+     ],
+     "caption": "Each arrow is a place to break the chain: filtering, a user who pauses and reports, phishing-resistant MFA that will not work on the fake page, and alerts on new forwarding rules."
     },
     {
      "type": "flow",
@@ -3954,6 +5147,17 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Most incidents start with phishing or malware, and support hears about them first.",
+      "Teach users to pause, report and tell IT at once if they clicked or typed a password.",
+      "Verify payment or bank-detail changes through a known contact, never the message itself.",
+      "Layer antivirus, EDR and hardening such as allow-listing and macro blocking.",
+      "Suspected ransomware: isolate first, report, then follow the incident process."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -4062,30 +5266,54 @@ TRACK.modules.push({
      "title": "Encryption building blocks"
     },
     {
-     "type": "flow",
-     "items": [
+     "type": "sequence",
+     "title": "How HTTPS protects a session",
+     "actors": [
+      "Browser",
+      "Web server"
+     ],
+     "steps": [
       {
-       "label": "Hello",
-       "text": "Browser and server agree on protocol versions and ciphers."
+       "from": 0,
+       "to": 1,
+       "label": "ClientHello: versions, ciphers, key share"
       },
       {
-       "label": "Certificate",
-       "text": "Server proves its identity with a certificate signed by a trusted authority."
+       "from": 1,
+       "to": 0,
+       "label": "ServerHello + key share",
+       "reply": true
       },
       {
-       "label": "Key exchange",
-       "text": "Both sides derive a shared symmetric session key."
+       "from": 1,
+       "to": 0,
+       "label": "Certificate + proof of private key",
+       "reply": true,
+       "note": "already encrypted in TLS 1.3"
       },
       {
-       "label": "Encrypted data",
-       "text": "Traffic is encrypted and integrity-checked with that key."
+       "from": 0,
+       "to": 0,
+       "label": "Checks chain, name and dates"
       },
       {
-       "label": "Close",
-       "text": "Session keys are discarded; new sessions get new keys."
+       "from": 0,
+       "to": 1,
+       "label": "Finished"
+      },
+      {
+       "from": 0,
+       "to": 1,
+       "label": "HTTP request (encrypted)"
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "HTTP response (encrypted)",
+       "reply": true
       }
      ],
-     "title": "How HTTPS protects a session"
+     "caption": "Both sides derive the same session key from their key shares, so the key never crosses the network. A certificate warning means step 4 failed: wrong name, expired, untrusted issuer, or someone intercepting."
     },
     {
      "type": "callout",
@@ -4129,6 +5357,7 @@ TRACK.modules.push({
      "device": "Windows PowerShell",
      "lines": [
       "manage-bde -status C:",
+      "manage-bde -protectors -get C:   # shows the recovery password ID to match against escrow",
       "Get-BitLockerVolume | Select-Object MountPoint, VolumeStatus, ProtectionStatus, EncryptionPercentage",
       "# Linux (LUKS): sudo cryptsetup status /dev/mapper/cryptroot",
       "# macOS: fdesetup status"
@@ -4179,35 +5408,32 @@ TRACK.modules.push({
      "title": "Data protection habits for support staff"
     },
     {
-     "type": "framework",
+     "type": "cycle",
+     "title": "Incident handling phases",
+     "center": "Incident response",
      "items": [
       {
-       "label": "P",
-       "title": "Prepare",
+       "label": "Prepare",
        "text": "Contacts, tools, playbooks and training in place before anything happens."
       },
       {
-       "label": "D",
-       "title": "Detect and analyse",
+       "label": "Detect and analyse",
        "text": "Recognise and confirm the incident; record facts and times."
       },
       {
-       "label": "C",
-       "title": "Contain",
+       "label": "Contain",
        "text": "Isolate devices, disable accounts, block indicators to stop the spread."
       },
       {
-       "label": "E",
-       "title": "Eradicate and recover",
+       "label": "Eradicate and recover",
        "text": "Remove the cause, rebuild, restore from clean backups, monitor."
       },
       {
-       "label": "L",
-       "title": "Learn",
+       "label": "Learn",
        "text": "Review what happened and improve controls and processes."
       }
      ],
-     "title": "Incident handling phases"
+     "caption": "Lessons learned feed back into preparation, so each incident should make the next one smaller. Support staff act mostly in Detect and Contain: notice, report fast and isolate."
     },
     {
      "type": "template",
@@ -4305,6 +5531,17 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Symmetric keys encrypt bulk data, asymmetric keys solve key exchange and signatures, and hashes detect change.",
+      "Encrypt data at rest and in transit, and escrow recovery keys before anyone needs them.",
+      "Recovery keys get the same identity checks as a password reset.",
+      "Classify data and handle it by its label; report suspected breaches immediately.",
+      "Incidents run prepare, detect, contain, eradicate and recover, learn."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -4395,7 +5632,7 @@ TRACK.modules.push({
    "blocks": [
     {
      "type": "text",
-     "text": "Every support team has tasks it repeats dozens of times a week: checking disk space, creating accounts, collecting inventory, clearing caches. Scripting turns those tasks into a few seconds of reliable work, frees time for real problems and removes typing mistakes. **PowerShell** is the standard automation shell on Windows and also runs on Linux and macOS."
+     "text": "Every support team has tasks it repeats dozens of times a week: checking disk space, creating accounts, collecting inventory, clearing caches. Scripting turns those tasks into a few seconds of reliable work, frees time for real problems and removes typing mistakes. **PowerShell** is the standard automation shell on Windows: Windows PowerShell 5.1 ships with the OS, and the newer, cross-platform PowerShell 7 also runs on Linux and macOS."
     },
     {
      "type": "formula",
@@ -4412,6 +5649,49 @@ TRACK.modules.push({
       }
      ],
      "title": "Is it worth automating?"
+    },
+    {
+     "type": "chart",
+     "kind": "line",
+     "title": "When the script pays back",
+     "labels": [
+      "Month 0",
+      "Month 1",
+      "Month 2",
+      "Month 3",
+      "Month 4",
+      "Month 5",
+      "Month 6"
+     ],
+     "series": [
+      {
+       "name": "Hours invested",
+       "values": [
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10
+       ]
+      },
+      {
+       "name": "Hours saved (cumulative)",
+       "values": [
+        0,
+        14.7,
+        29.3,
+        44,
+        58.7,
+        73.3,
+        88
+       ]
+      }
+     ],
+     "unit": " h",
+     "yLabel": "hours",
+     "caption": "Uses the example above: 10 hours to build and test, about 14.7 hours saved each month. The lines cross within the first month; after that every run is pure gain."
     },
     {
      "type": "table",
@@ -4501,6 +5781,7 @@ TRACK.modules.push({
      "type": "keypoints",
      "items": [
       "Read every line of a script before running it, especially from the internet.",
+      "Treat AI-generated scripts like forum code: understand and test every line before it runs.",
       "Use `-WhatIf` on cmdlets that change things to preview the effect.",
       "Test in a VM or on a test account before production.",
       "Start with read-only commands; add changes only when the output is correct.",
@@ -4577,6 +5858,17 @@ TRACK.modules.push({
        "term": "Execution policy",
        "def": "A PowerShell setting that controls which scripts are allowed to run on a system."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Automate tasks that are frequent, repetitive and error-prone; check the payback.",
+      "PowerShell passes objects through the pipeline; $_ is the current object.",
+      "Preview changes with -WhatIf and start with read-only commands.",
+      "Parameters make scripts reusable without editing them.",
+      "Execution policy prevents accidents but is not a security boundary."
      ]
     },
     {
@@ -4839,6 +6131,53 @@ TRACK.modules.push({
      "title": "Reading a cron schedule"
     },
     {
+     "type": "sequence",
+     "title": "What happens when cron runs the health check",
+     "actors": [
+      "cron",
+      "disk-check.sh",
+      "df",
+      "Log file"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 1,
+       "label": "06:30 Mon-Fri: start script",
+       "note": "minimal PATH and environment"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "df -P -x tmpfs -x devtmpfs"
+      },
+      {
+       "from": 2,
+       "to": 1,
+       "label": "Usage per file system",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 1,
+       "label": "Compare each % with threshold"
+      },
+      {
+       "from": 1,
+       "to": 3,
+       "label": "WARNING: /var is 91% full",
+       "note": "via >> log 2>&1 in the crontab"
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "Exit code 0",
+       "reply": true
+      }
+     ],
+     "caption": "cron starts the script with a minimal environment, which is why absolute paths matter. Redirecting output to a log file is the only way to see what an unattended run actually did."
+    },
+    {
      "type": "scenario",
      "situation": "A junior admin wrote a Bash script to delete old files in `$LOGDIR`. On one server the variable was not set and the script removed files from the wrong place before someone stopped it.",
      "options": [
@@ -4896,6 +6235,17 @@ TRACK.modules.push({
        "term": "set -euo pipefail",
        "def": "Bash options that stop a script on errors, unset variables and failed pipeline commands."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Start scripts with a shebang and set -euo pipefail.",
+      "Always quote variables and check that target directories exist before deleting.",
+      "Exit code 0 means success; test $? or use if to react to failures.",
+      "grep, awk, sort and uniq turn logs into answers quickly.",
+      "Schedule with cron using absolute paths, and log every run."
      ]
     },
     {
@@ -5000,6 +6350,115 @@ TRACK.modules.push({
       "# Remove -WhatIf when the preview is correct; set passwords and enable accounts in a separate, logged step"
      ],
      "title": "Onboarding from a CSV file (preview first)"
+    },
+    {
+     "type": "topology",
+     "title": "Onboarding automation from HR data to SaaS accounts",
+     "nodes": [
+      {
+       "id": "hr",
+       "kind": "db",
+       "label": "HR system",
+       "sub": "new starter record",
+       "x": 0,
+       "y": 1
+      },
+      {
+       "id": "csv",
+       "kind": "doc",
+       "label": "CSV / HR feed",
+       "sub": "agreed format",
+       "x": 2,
+       "y": 1
+      },
+      {
+       "id": "job",
+       "kind": "process",
+       "label": "Onboarding job",
+       "sub": "preview, log, idempotent",
+       "x": 4,
+       "y": 1
+      },
+      {
+       "id": "vault",
+       "kind": "vault",
+       "label": "Vault",
+       "sub": "no secrets in code",
+       "x": 2,
+       "y": 3
+      },
+      {
+       "id": "dir",
+       "kind": "server",
+       "label": "Directory",
+       "sub": "account + role groups",
+       "x": 4,
+       "y": 3
+      },
+      {
+       "id": "idp",
+       "kind": "idp",
+       "label": "Cloud identity",
+       "sub": "licences by group",
+       "x": 6,
+       "y": 3
+      },
+      {
+       "id": "log",
+       "kind": "doc",
+       "label": "Log and ticket",
+       "sub": "every action recorded",
+       "x": 2,
+       "y": 5
+      },
+      {
+       "id": "saas",
+       "kind": "cloud",
+       "label": "SaaS apps",
+       "sub": "accounts via SCIM",
+       "x": 6,
+       "y": 5
+      }
+     ],
+     "links": [
+      {
+       "a": "hr",
+       "b": "csv",
+       "label": "export"
+      },
+      {
+       "a": "csv",
+       "b": "job",
+       "label": "input"
+      },
+      {
+       "a": "vault",
+       "b": "job",
+       "label": "credential",
+       "style": "dashed"
+      },
+      {
+       "a": "job",
+       "b": "dir",
+       "label": "create (disabled)"
+      },
+      {
+       "a": "job",
+       "b": "log",
+       "label": "log"
+      },
+      {
+       "a": "dir",
+       "b": "idp",
+       "label": "sync"
+      },
+      {
+       "a": "idp",
+       "b": "saas",
+       "label": "SCIM"
+      }
+     ],
+     "caption": "HR data drives everything: the job reads an agreed format, takes credentials from a vault, creates disabled accounts in the directory and logs every action. Licences and SaaS accounts then follow from group membership."
     },
     {
      "type": "cli",
@@ -5173,6 +6632,17 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Scheduled, logged automation saves days, not minutes.",
+      "Drive bulk changes from structured input such as an agreed CSV, and preview first.",
+      "Safe automation is idempotent, logged, error-aware, least-privileged and reviewed.",
+      "Keep credentials in a vault, never in scripts, CSV files or commits.",
+      "Store scripts in version control with a register of owners and schedules."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -5330,7 +6800,9 @@ TRACK.modules.push({
      "rows": 8
     },
     {
-     "type": "flow",
+     "type": "cycle",
+     "title": "The IT asset lifecycle",
+     "center": "Asset register",
      "items": [
       {
        "label": "Plan and buy",
@@ -5353,7 +6825,7 @@ TRACK.modules.push({
        "text": "Data wiped, record updated, disposal or reuse."
       }
      ],
-     "title": "The IT asset lifecycle"
+     "caption": "Retirement feeds the next purchase plan, so lifecycle dates in the register drive the refresh budget. Wiping data at Retire is never optional."
     },
     {
      "type": "table",
@@ -5413,6 +6885,33 @@ TRACK.modules.push({
       }
      ],
      "title": "Lifecycle and cost maths"
+    },
+    {
+     "type": "chart",
+     "kind": "line",
+     "title": "Book value of a BDT 120,000 laptop (straight-line)",
+     "labels": [
+      "Year 0",
+      "Year 1",
+      "Year 2",
+      "Year 3",
+      "Year 4"
+     ],
+     "series": [
+      {
+       "name": "Book value",
+       "values": [
+        120000,
+        95000,
+        70000,
+        45000,
+        20000
+       ]
+      }
+     ],
+     "unit": " BDT",
+     "yLabel": "BDT",
+     "caption": "Straight-line depreciation removes the same BDT 25,000 each year until the residual value is reached. Book value is an accounting figure: a device can stay useful after it, or become unsafe before it if OS support ends."
     },
     {
      "type": "callout",
@@ -5489,6 +6988,17 @@ TRACK.modules.push({
        "term": "Depreciation",
        "def": "The reduction in an asset's book value over its useful life."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Documentation turns one person's knowledge into the organisation's knowledge.",
+      "Write runbooks with numbered steps, expected results and what to do if a step fails.",
+      "Track every asset from purchase to disposal and wipe data before reuse.",
+      "Compare options by total cost of ownership, not purchase price.",
+      "Give every document an owner and a review date."
      ]
     },
     {
@@ -5663,45 +7173,39 @@ TRACK.modules.push({
      "title": "Common interview questions and what they test"
     },
     {
-     "type": "table",
-     "head": [
-      "Path",
-      "Next roles",
-      "Skills to build"
-     ],
-     "rows": [
-      [
-       "Systems administration",
-       "Sysadmin, Windows/Linux engineer",
-       "Directory services, scripting, virtualisation"
-      ],
-      [
-       "Networking",
-       "Network technician, network engineer",
-       "Routing, switching, Wi-Fi design, firewalls"
-      ],
-      [
-       "Cloud",
-       "Cloud support, cloud engineer",
-       "IaaS, identity, infrastructure as code, cost management"
-      ],
-      [
-       "Security",
-       "SOC analyst, security engineer",
-       "Logs, incident response, vulnerability management"
-      ],
-      [
-       "Service management",
-       "Service desk lead, IT service manager",
-       "ITSM processes, metrics, people leadership"
-      ],
-      [
-       "Endpoint and modern workplace",
-       "Endpoint engineer, SaaS workspace administrator",
-       "MDM, application packaging, SaaS administration"
+     "type": "tree",
+     "title": "Where IT support can lead",
+     "root": {
+      "label": "IT support",
+      "text": "Service desk, desktop support",
+      "children": [
+       {
+        "label": "Systems administration",
+        "text": "Sysadmin, Windows/Linux engineer. Build: directory, scripting, virtualisation"
+       },
+       {
+        "label": "Networking",
+        "text": "Network technician or engineer. Build: routing, switching, Wi-Fi, firewalls"
+       },
+       {
+        "label": "Cloud",
+        "text": "Cloud support or engineer. Build: IaaS, identity, infrastructure as code, cost"
+       },
+       {
+        "label": "Security",
+        "text": "SOC analyst, security engineer. Build: logs, incident response, vulnerabilities"
+       },
+       {
+        "label": "Service management",
+        "text": "Desk lead, IT service manager. Build: ITSM, metrics, leadership"
+       },
+       {
+        "label": "Modern workplace",
+        "text": "Endpoint or SaaS admin. Build: MDM, app packaging, SaaS admin"
+       }
       ]
-     ],
-     "title": "Where IT support can lead"
+     },
+     "caption": "Every branch starts from skills you use daily in support. Pick one direction, then build lab evidence for the skills listed under it."
     },
     {
      "type": "callout",
@@ -5715,6 +7219,7 @@ TRACK.modules.push({
       "Access only what a task requires, even when your rights allow more.",
       "Keep users' data and conversations confidential.",
       "Never install pirated software or bypass licensing.",
+      "Use AI tools within policy: no confidential data in unapproved tools, and verify every output.",
       "Report security issues and mistakes, including your own, quickly.",
       "Be honest about what you do not know and about timelines.",
       "Treat every user with the same respect, whatever their role."
@@ -5805,6 +7310,17 @@ TRACK.modules.push({
        "term": "Professional ethics",
        "def": "Principles of honest, confidential and responsible conduct expected of trusted IT staff."
       }
+     ]
+    },
+    {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Prove skills with evidence: measurable CV lines, a portfolio and home-lab write-ups.",
+      "Answer behavioural questions with STAR, using 'I' for your own actions.",
+      "Support leads to systems, networking, cloud, security, service management or modern workplace roles.",
+      "Pair every certificate with a project that shows you can apply it.",
+      "Ethics, honesty and confidentiality are what make a support professional trusted."
      ]
     },
     {
